@@ -1,29 +1,18 @@
-#ifndef DEFINITIONS_H
-#define DEFINITIONS_H
+// :: Functions ::
+#define COUT writeDebugStream
+#define COUTL writeDebugStreamLine
 
-int steps = 0;
-void waitForStart_II()
+// :: Motors ::
+#define Motor_Drive_Left motorD
+#define Motor_Drive_Right motorE
+
+// :: Servos ::
+
+
+/*
+* Returns the current time value of a timer
+*/
+float GetTime(TTimers timer)
 {
-  while (true)
-  {
-    getJoystickSettings(joystick);
-    steps++;
-    if(steps >= 100)
-    {
-   steps = 0;
-    eraseDisplay();
-    nxtDisplayCenteredTextLine(2, "Waiting for");
-    nxtDisplayCenteredTextLine(3, "start!");
-  }
-   /* if (!joystick.StopPgm)
-      break;*/
-  }
-  return;
+	return (float)time1[timer] / 1000.0;
 }
-
-void DrawDebug()
-{
-
-}
-
-#endif
