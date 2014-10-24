@@ -26,7 +26,8 @@
 enum Mode
 {
 	Autonomous,
-	Teleop
+	Teleop,
+	Finished
 };
 
 #pragma debuggerWindows("joystickGame");
@@ -39,12 +40,15 @@ Mode RobotMode = Autonomous;
 Mode RobotMode = Teleop;
 #endif
 bool Running = true;
+int VolumeStore;
 
 /*
 * Initialize the Robot and ensure that the software is ready to operate.
 */
 void Init()
 {
+	VolumeStore =nVolume; // Store the Initial Volume Setting
+	nVolume = 4; // Maximum Volume
 	if(RobotMode == Autonomous)
 	{
 #ifdef DEBUG
@@ -93,19 +97,29 @@ void EndState()
 	{
 		End_Teleop(); // Update Drive Mode
 #ifdef DEBUG
-		 writeDebugStreamLine("Teleop Mode End!"); // Debug
+		writeDebugStreamLine("Teleop Mode End!"); // Debug
 #endif
 		Running = false;
+		RobotMode = Finished;
 	}
 #endif
+	if (RobotMode == Autonomous)
+	{
+		nVolume = VolumeStore; // Restore the Initial Volume Setting
+	}
 }
 
 /*
 * Call the main update functions of all the inuse functionality
 * Update the current mode that the robot is using. Autonomous/Drive
 */
-void Update(float delta)
+void Update()
 {
+	alive(); // Reset sleep timer
+	// Calculate Elapsed Time
+	float delta = GetTime(T1);
+	TotalTime += delta; // Accumulate time
+
 #ifdef AUTO
 	if (RobotMode == Autonomous)
 	{
@@ -118,7 +132,7 @@ void Update(float delta)
 #endif
 #ifdef TELE
 #ifdef AUTO
-else
+	else
 #endif
 	if (RobotMode == Teleop)
 	{
@@ -138,11 +152,8 @@ task main
 	Init();
 	while (Running)
 	{
-		// Calculate Elapsed Time
-		float delta = GetTime(T1);
-		TotalTime += delta; // Accumulate time
-
 		// Update
-		Update((float)delta);
+		Update();
 	}
+	EndState();
 }

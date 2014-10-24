@@ -1,4 +1,4 @@
-#include "Controller.c"
+#include "controller.c"
 
 // :: Variables ::
 Controller ControllerA;
@@ -20,8 +20,6 @@ void Init_Teleop()
 	// Set the memory speed of all the motors to 0
 	// TEST CODE
 	memset(&motor[motorA], 0x00, sizeof(motor[motorA]) * 11); // Set the first 11 motors to 0 speed
-
-
 }
 
 /*
@@ -31,7 +29,7 @@ void Init_Teleop()
 */
 signed char Map(ButtonState &bA, ButtonState &bB, signed char iA, signed char iB, signed char def)
 {
-	return bA == Active ? iA : (bB == Active ? iB : 0);
+return bA == Active ? iA : (bB == Active ? iB : 0);
 }
 
 /*
@@ -48,7 +46,7 @@ void Update_Teleop()
 	// Clamped squared interpolation for the drive motors
 	float rotation = -ControllerA.RightStick.x;
 	if(rotation*rotation < 0.0025) rotation = 0;
-	else rotation *= (rotation<0) ? -rotation : rotation; // Same sign, Squared Value
+else rotation *= (rotation<0) ? -rotation : rotation; // Same sign, Squared Value
 
 	// Each wheel shares a +- Speed Value depending on the LeftStick Y Axis
 	// The value is manipulated by the +- Linear Interpolated Value of the Rotation

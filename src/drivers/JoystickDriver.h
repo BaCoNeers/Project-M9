@@ -397,6 +397,7 @@ void getUserControlProgram(string& sFileName)
 */
 void waitForStart()
 {
+#ifndef DEBUG
   while (true)
   {
     getJoystickSettings(joystick);
@@ -405,10 +406,11 @@ void waitForStart()
     eraseDisplay();
     displayCenteredTextLine(2, "Waiting for");
     displayCenteredTextLine(3, "start!");
-
-    if (!joystick.StopPgm) break;
+		alive(); // Reset sleep timer
+    if (!joystick.StopPgm || joystick.joy1Btn(10)) break;
   }
   return;
+#endif
 }
 
 /*

@@ -57,11 +57,11 @@ void SetButtonState(ButtonState &out, bool state)
 {
 	switch (out)
 	{
-		case Inactive:	{out = state ? Pressed : Inactive; }		break;
-		case Active:		{out = state ? Active : Released;  } 		break;
-		case Pressed:		{out = state ? Active : Released;  } 		break;
-		case Released:	{out = state ? Active : Inactive;  } 		break;
-		default:				{out = Inactive;         		   }
+	case Inactive:	{out = state ? Pressed : Inactive; }		break;
+	case Active:		{out = state ? Active : Released;  } 		break;
+	case Pressed:		{out = state ? Active : Released;  } 		break;
+	case Released:	{out = state ? Active : Inactive;  } 		break;
+	default:				{out = Inactive;         		   }
 	}
 }
 
