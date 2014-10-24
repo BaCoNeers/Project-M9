@@ -68,12 +68,12 @@ void SetButtonState(ButtonState &out, bool state)
 /*
 * Set the current Up,Down,Left,Right DPad Button States based on an input set array
 */
-void SetDPadState(Controller &controller, char* input_state_set)
+void SetDPadState(Controller &controller, char* const input_state_set)
 {
-	SetButtonState(controller.Buttons.Dpad_Up, (bool)input_state_set[0]);
-	SetButtonState(controller.Buttons.Dpad_Down, (bool)input_state_set[1]);
-	SetButtonState(controller.Buttons.Dpad_Left, (bool)input_state_set[2]);
-	SetButtonState(controller.Buttons.Dpad_Right, (bool)input_state_set[3]);
+	SetButtonState(controller.Buttons.Dpad_Up, (const bool)input_state_set[0]);
+	SetButtonState(controller.Buttons.Dpad_Down, (const bool)input_state_set[1]);
+	SetButtonState(controller.Buttons.Dpad_Left, (const bool)input_state_set[2]);
+	SetButtonState(controller.Buttons.Dpad_Right, (const bool)input_state_set[3]);
 }
 
 // Applies a threshold to a decimal value and returns a scaled ratio
@@ -96,7 +96,7 @@ float ApplyThreshold(float value)
 	return value;
 }
 
-char dpad_states[9][4] =
+const char dpad_states[9][4] =
 {
 	{ 1, 0, 0, 0 },
 	{ 0, 0, 0, 1 },
