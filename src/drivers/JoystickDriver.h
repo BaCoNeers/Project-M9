@@ -99,9 +99,9 @@
 
 	#define getJoystickSettings(joystick) 	memcpy(joystick, joystickCopy, sizeof(joystick))
 
-	short joy1Btn(int btn)
+	short joy1Btn(const char btn)
 	{   return ((joystick.joy1_Buttons & (1 << (btn - 1))) != 0);  }
-	short joy2Btn(int btn)
+	short joy2Btn(const char btn)
 	{   return ((joystick.joy2_Buttons & (1 << (btn - 1))) != 0);  }
 
 #else

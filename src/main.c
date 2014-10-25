@@ -138,7 +138,7 @@ void Update()
 	{
 		Update_Teleop(); // Update Drive Mode
 #ifdef DEBUG
-		if(ControllerA.Buttons.Start == Pressed) EndState();
+		if(ControllerA.Buttons.Start == ButtonState_Pressed) EndState();
 #endif
 	}
 #endif

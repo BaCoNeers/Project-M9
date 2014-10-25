@@ -27,9 +27,9 @@ void Init_Teleop()
 * Returns the value for either Pressed or Active button states
 * bA (Button1), bB (Button2), iA (Motor Value1), iB (Motor Value2), def (Default Motor Value)
 */
-signed char Map(ButtonState &bA, ButtonState &bB, signed char iA, signed char iB, signed char def)
+signed char Map(byte &bA, byte &bB, signed char iA, signed char iB, signed char def)
 {
-return bA == Active ? iA : (bB == Active ? iB : 0);
+return bA == ButtonState_Active ? iA : (bB == ButtonState_Active ? iB : 0);
 }
 
 /*
@@ -38,8 +38,8 @@ return bA == Active ? iA : (bB == Active ? iB : 0);
 void Update_Teleop()
 {
 	// Update Controllers
-	UpdateController(ControllerA);
-	UpdateController(ControllerB);
+	Update_Controller(ControllerA);
+	Update_Controller(ControllerB);
 
 	// : Calculate Motor Speed
 
@@ -79,7 +79,7 @@ else rotation *= (rotation<0) ? -rotation : rotation; // Same sign, Squared Valu
 	motor[Motor_Drive_Left] = Map(ControllerA.Buttons.LB, ControllerA.Buttons.LT, 100, 100, 0);
 	motor[Motor_Drive_Right] = Map(ControllerA.Buttons.RB, ControllerA.Buttons.RT, -100, -100, 0);
 
-	if (ControllerA.Buttons.LeftStick == Active) playImmediateTone(500,10); // Input Test aka Horn
+	if (ControllerA.Buttons.LeftStick == ButtonState_Active) playImmediateTone(500,10); // Input Test aka Horn
 }
 
 /*
