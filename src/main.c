@@ -1,4 +1,5 @@
 #pragma config(Hubs,  S1, HTMotor,  none,     none,     none)
+#pragma config(Sensor, S1,     ,               sensorI2CMuxController)
 #pragma config(Motor,  motorA,           ,             tmotorNXT, openLoop, encoder)
 #pragma config(Motor,  motorB,           ,             tmotorNXT, openLoop, encoder)
 #pragma config(Motor,  motorC,           ,             tmotorNXT, openLoop, encoder)
@@ -142,6 +143,7 @@ void Update()
 #endif
 	}
 #endif
+if (ControllerA.Buttons.LeftStick == ButtonState_Active) playImmediateTone(500,1); // Input Test aka Horn
 }
 
 /*
@@ -154,6 +156,7 @@ task main
 	{
 		// Update
 		Update();
+		Sleep(2);
 	}
 	EndState();
 }
