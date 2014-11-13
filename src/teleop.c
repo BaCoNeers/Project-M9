@@ -42,17 +42,27 @@ void Update_Teleop()
 	Update_Controller(ControllerB);
 
 	// : Calculate Motor Speed
-
+/*
 	// Clamped squared interpolation for the drive motors
 	float rotation = -ControllerA.RightStick.x;
 	if(rotation*rotation < 0.0025) rotation = 0;
-else rotation *= (rotation<0) ? -rotation : rotation; // Same sign, Squared Value
+	else rotation *= (rotation<0) ? -rotation : rotation; // Same sign, Squared Value
 
 	// Each wheel shares a +- Speed Value depending on the LeftStick Y Axis
 	// The value is manipulated by the +- Linear Interpolated Value of the Rotation
-	float speed = ControllerA.LeftStick.y;
+	float speed = ControllerA.RightStick.x;
 	float leftmotorspeed = lerp(speed,-speed, rotation);
 	float rightmotorspeed = -lerp(speed,-speed, rotation);
+*/
+
+	// Clamped squared interpolation for the drive motors
+	float rotation = -controllerA.rightStick.x * 0.75;
+	rotation *= (rotation<0) ? -rotation : rotation;
+
+	// : Calculate Motor Speed
+	float leftmotorspeed = -lerp(controllerA.leftStick.y, -controllerA.leftStick.y, rotation);
+	float rightmotorspeed = lerp(controllerA.leftStick.y, -controllerA.leftStick.y, -rotation);
+
 
 	// :: Drive State Controller Mapping ::
 	// ** Calculate the lerp between the positive position of the xaxis lerp(-1,1, (controller#.#Stick.x+1.0)/2.0)
@@ -74,12 +84,10 @@ else rotation *= (rotation<0) ? -rotation : rotation; // Same sign, Squared Valu
 
 	// : Mapping of Servos and Motors to Sticks and Buttons :
 	motor[Motor_Drive_Left] = MotorSpeed * leftmotorspeed;
-	motor[Motor_Drive_Right] = -MotorSpeed * rightmotorspeed;
+	motor[Motor_Drive_Right] = MotorSpeed * rightmotorspeed;
 
-	motor[Motor_Drive_Left] = Map(ControllerA.Buttons.LB, ControllerA.Buttons.LT, 100, 100, 0);
-	motor[Motor_Drive_Right] = Map(ControllerA.Buttons.RB, ControllerA.Buttons.RT, -100, -100, 0);
-
-	if (ControllerA.Buttons.LeftStick == ButtonState_Active) playImmediateTone(500,10); // Input Test aka Horn
+	//motor[Motor_Drive_Left] = Map(ControllerA.Buttons.LB, ControllerA.Buttons.LT, 100, 100, 0);
+	//motor[Motor_Drive_Right] = Map(ControllerA.Buttons.RB, ControllerA.Buttons.RT, -100, -100, 0);
 }
 
 /*
