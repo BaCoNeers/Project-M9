@@ -168,5 +168,5 @@ void Update_Controller(Controller &controller)
 
 	// Update Controller D-Pad
 	controller.Buttons.Dpad_State = joystick.joy1_TopHat;
-	Controller_SetDPadState(controller, &dpad_states[controller.Buttons.Dpad_State][0]);
+	//Controller_SetDPadState(controller, dpad_states[controller.Buttons.Dpad_State]);
 }
