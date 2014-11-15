@@ -142,6 +142,7 @@ void Update()
 #endif
 	}
 #endif
+if (ControllerA.Buttons.LeftStick == ButtonState_Active) playImmediateTone(500,1); // Input Test aka Horn
 }
 
 /*
@@ -154,6 +155,7 @@ task main
 	{
 		// Update
 		Update();
+		Sleep(2);
 	}
 	EndState();
 }
