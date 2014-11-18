@@ -31,7 +31,8 @@ signed char Map(byte &bA, byte &bB, signed char iA, signed char iB, signed char 
 {
 return bA == ButtonState_Active ? iA : (bB == ButtonState_Active ? iB : 0);
 }
-
+int count = 0;
+int speed = 5;
 /*
 * Updates Teleop
 */
@@ -56,17 +57,20 @@ void Update_Teleop()
 */
 
 	// Clamped squared interpolation for the drive motors
-	float rotation = -controllerA.rightStick.x;
-	//rotation *= (rotation<0) ? -rotation : rotation;
+	float rotation = -controllerA.rightStick.x * 0.75;
+	rotation *= (rotation<0) ? -rotation : rotation;
 
 	// : Calculate Motor Speed
-	float leftmotorspeed = lerp(controllerA.leftStick.y, -controllerA.leftStick.y, rotation);
+	float leftmotorspeed = -lerp(controllerA.leftStick.y, -controllerA.leftStick.y, rotation);
 	float rightmotorspeed = lerp(controllerA.leftStick.y, -controllerA.leftStick.y, -rotation);
-  /*leftmotorspeed = controllerA.leftStick.y * rotation;
-  rightmotorspeed = controllerA.leftStick.y * -rotation;
-  leftmotorspeed = lerp(controllerA.leftStick.y, leftmotorspeed, rotation);
-  rightmotorspeed = lerp(controllerA.leftStick.y, leftmotorspeed, rotation);
-*/
+
+	motor[motorI] = Map(ControllerA.Buttons.A, ControllerA.Buttons.B, speed, -speed, 0);
+	int deltame = nMotorEncoder[motorI];
+	nMotorEncoder[motorI] = 0;
+
+	count += deltame;
+//	playImmediateTone(100+count, 10);
+
 	// :: Drive State Controller Mapping ::
 	// ** Calculate the lerp between the positive position of the xaxis lerp(-1,1, (controller#.#Stick.x+1.0)/2.0)
 	/*
@@ -87,7 +91,7 @@ void Update_Teleop()
 
 	// : Mapping of Servos and Motors to Sticks and Buttons :
 	motor[Motor_Drive_Left] = MotorSpeed * leftmotorspeed;
-	motor[Motor_Drive_Right] = MotorSpeed * -rightmotorspeed;
+	motor[Motor_Drive_Right] = MotorSpeed * rightmotorspeed;
 
 	//motor[Motor_Drive_Left] = Map(ControllerA.Buttons.LB, ControllerA.Buttons.LT, 100, 100, 0);
 	//motor[Motor_Drive_Right] = Map(ControllerA.Buttons.RB, ControllerA.Buttons.RT, -100, -100, 0);
