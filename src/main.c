@@ -126,6 +126,7 @@ void Update()
 	// Calculate Elapsed Time
 	float delta = GetTime(T1);
 	TotalTime += delta; // Accumulate time
+	time1[T1] = 0;
 
 #ifdef AUTO
 	if (RobotMode == Autonomous)
@@ -162,7 +163,7 @@ task main
 	{
 		// Update
 		Update();
-		Sleep(2);
+		sleep(2);
 	}
 	EndState();
 }

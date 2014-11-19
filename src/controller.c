@@ -15,7 +15,7 @@
 */
 
 // :: Includes ::
-#include "drivers\JoystickDriver.h"
+#include "JoystickDriver.c"
 
 // :: Type Definitions ::
 #define ButtonState_Inactive 0x00
@@ -109,21 +109,6 @@ void Update_Controller(Controller &controller)
 	// Update the Joystick(s)
 	getJoystickSettings(joystick);
 
-	// Update the Joystick
-	// Use a square threshold because of the LS-X-A-RS-Y-A racing layout
-	if(controller.ControllerID == 0)
-	{
-		controller.LeftStick.x = Controller_ApplyThreshold((float)joystick.joy1_x1 / 128.0);
-		controller.LeftStick.y = Controller_ApplyThreshold((float)joystick.joy1_y1 / 128.0);
-		controller.RightStick.x = Controller_ApplyThreshold((float)joystick.joy1_x2 / 128.0);
-		controller.RightStick.y = Controller_ApplyThreshold((float)joystick.joy1_y2 / 128.0);
-	} else if (controller.ControllerID == 1)
-	{
-		controller.LeftStick.x = Controller_ApplyThreshold((float)joystick.joy2_x1 / 128.0);
-		controller.LeftStick.y = Controller_ApplyThreshold((float)joystick.joy2_y1 / 128.0);
-		controller.RightStick.x = Controller_ApplyThreshold((float)joystick.joy2_x2 / 128.0);
-		controller.RightStick.y = Controller_ApplyThreshold((float)joystick.joy2_y2 / 128.0);
-	}
 
 	const char BUTTON_X = 0x01;			//Left-most on the front face (Labeled X on newer joysticks)
 	const char BUTTON_A = 0x02;			//Bottom-most on the front face (Labeled A on newer joysticks)
@@ -151,6 +136,23 @@ void Update_Controller(Controller &controller)
 	Controller_SetButtonState(controller.Buttons.RightStick, joy1Btn(BUTTON_RS));
 	Controller_SetButtonState(controller.Buttons.LT, joy1Btn(BUTTON_LT));
 	Controller_SetButtonState(controller.Buttons.RT, joy1Btn(BUTTON_RT));
+
+
+	// Update the Joystick
+	// Use a square threshold because of the LS-X-A-RS-Y-A racing layout
+	if(controller.ControllerID == 0)
+	{
+		controller.LeftStick.x = Controller_ApplyThreshold((float)joystick.joy1_x1 / 128.0);
+		controller.LeftStick.y = Controller_ApplyThreshold((float)joystick.joy1_y1 / 128.0);
+		controller.RightStick.x = Controller_ApplyThreshold((float)joystick.joy1_x2 / 128.0);
+		controller.RightStick.y = Controller_ApplyThreshold((float)joystick.joy1_y2 / 128.0);
+	} else if (controller.ControllerID == 1)
+	{
+		controller.LeftStick.x = Controller_ApplyThreshold((float)joystick.joy2_x1 / 128.0);
+		controller.LeftStick.y = Controller_ApplyThreshold((float)joystick.joy2_y1 / 128.0);
+		controller.RightStick.x = Controller_ApplyThreshold((float)joystick.joy2_x2 / 128.0);
+		controller.RightStick.y = Controller_ApplyThreshold((float)joystick.joy2_y2 / 128.0);
+	}
 
 	// DPad Button States
 	const char dpad_states[9][4] =

@@ -57,12 +57,12 @@ void Update_Teleop()
 */
 
 	// Clamped squared interpolation for the drive motors
-	float rotation = -controllerA.rightStick.x * 0.75;
+	float rotation = -ControllerA.RightStick.x * 0.75;
 	rotation *= (rotation<0) ? -rotation : rotation;
 
 	// : Calculate Motor Speed
-	float leftmotorspeed = -lerp(controllerA.leftStick.y, -controllerA.leftStick.y, rotation);
-	float rightmotorspeed = lerp(controllerA.leftStick.y, -controllerA.leftStick.y, -rotation);
+	float leftmotorspeed = -lerp(ControllerA.LeftStick.y, -ControllerA.LeftStick.y, rotation);
+	float rightmotorspeed = lerp(ControllerA.LeftStick.y, -ControllerA.LeftStick.y, -rotation);
 
 	motor[motorI] = Map(ControllerA.Buttons.A, ControllerA.Buttons.B, speed, -speed, 0);
 	int deltame = nMotorEncoder[motorI];
@@ -80,13 +80,13 @@ void Update_Teleop()
 	Tangent wheel distance from center of mass = 20cm
 	Lerp ratio = 2*0.27 / 0.7 = 0.77
 
-	float rotation = controllerA.leftStick.x*controllerA.leftStick.x > 0.1 ?
-	lerp(0,1,controllerA.leftStick.x)
+	float rotation = ControllerA.leftStick.x*ControllerA.leftStick.x > 0.1 ?
+	lerp(0,1,ControllerA.leftStick.x)
 	: 0;
 	*/
 	// Unused
-	//float leftbackmotorspeed = -lerp(controllerA.leftStick.y, -controllerA.leftStick.y, rotation*0.77);
-	//float rightbackmotorspeed = -lerp(controllerA.leftStick.y, -controllerA.leftStick.y, -rotation*0.77);
+	//float leftbackmotorspeed = -lerp(ControllerA.leftStick.y, -ControllerA.leftStick.y, rotation*0.77);
+	//float rightbackmotorspeed = -lerp(ControllerA.leftStick.y, -ControllerA.leftStick.y, -rotation*0.77);
 
 
 	// : Mapping of Servos and Motors to Sticks and Buttons :
@@ -95,6 +95,9 @@ void Update_Teleop()
 
 	//motor[Motor_Drive_Left] = Map(ControllerA.Buttons.LB, ControllerA.Buttons.LT, 100, 100, 0);
 	//motor[Motor_Drive_Right] = Map(ControllerA.Buttons.RB, ControllerA.Buttons.RT, -100, -100, 0);
+
+	motor[motorA] = Map(ControllerA.Buttons.LB, ControllerA.Buttons.RB, 20, -20, 0);
+	motor[motorB] = -motor[motorA];
 }
 
 /*
