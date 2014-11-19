@@ -64,11 +64,24 @@ void Update_Teleop()
 	float leftmotorspeed = -lerp(ControllerA.LeftStick.y, -ControllerA.LeftStick.y, rotation);
 	float rightmotorspeed = lerp(ControllerA.LeftStick.y, -ControllerA.LeftStick.y, -rotation);
 
-	motor[motorI] = Map(ControllerA.Buttons.A, ControllerA.Buttons.B, speed, -speed, 0);
+	//motor[motorI] = Map(ControllerA.Buttons.A, ControllerA.Buttons.B, speed, -speed, 0);
 	int deltame = nMotorEncoder[motorI];
 	nMotorEncoder[motorI] = 0;
 
 	count += deltame;
+
+	if(ControllerA.Buttons.A) count = 0;
+	else
+	if(count > -1440 * 1 * 0.9875)
+	{
+		motor[motorI] = -100;
+	}
+	else
+	{
+		motor[motorI] = 0;
+	}
+
+
 //	playImmediateTone(100+count, 10);
 
 	// :: Drive State Controller Mapping ::
@@ -96,7 +109,7 @@ void Update_Teleop()
 	//motor[Motor_Drive_Left] = Map(ControllerA.Buttons.LB, ControllerA.Buttons.LT, 100, 100, 0);
 	//motor[Motor_Drive_Right] = Map(ControllerA.Buttons.RB, ControllerA.Buttons.RT, -100, -100, 0);
 
-	motor[motorA] = Map(ControllerA.Buttons.LB, ControllerA.Buttons.RB, 20, -20, 0);
+	motor[motorA] = Map(ControllerA.Buttons.LB, ControllerA.Buttons.RB, 200, -200, 0);
 	motor[motorB] = -motor[motorA];
 }
 
