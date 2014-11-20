@@ -72,15 +72,21 @@ void Update_Teleop()
 
 	if(ControllerA.Buttons.A) count = 0;
 	else
-	if(count > -1440 * 1 * 0.9875)
+	if(count > -650)
 	{
-		motor[motorI] = -100;
+		motor[motorI] = -40;
 	}
 	else
 	{
+		playImmediateTone(400,3);
 		motor[motorI] = 0;
 	}
 
+	if(ControllerA.Buttons.B)
+	{
+		count = -1000;
+		motor[motorI] = 25;
+	}
 
 //	playImmediateTone(100+count, 10);
 
