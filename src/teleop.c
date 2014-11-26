@@ -3,6 +3,7 @@
 // :: Variables ::
 Controller ControllerA;
 Controller ControllerB;
+HarvesterStatusEnum HarvesterStatus;
 int MotorSpeed = 100;
 
 // :: Methods ::
@@ -43,7 +44,7 @@ void Update_Teleop()
 	Update_Controller(ControllerB);
 
 	// : Calculate Motor Speed
-/*
+	/*
 	// Clamped squared interpolation for the drive motors
 	float rotation = -ControllerA.RightStick.x;
 	if(rotation*rotation < 0.0025) rotation = 0;
@@ -54,16 +55,35 @@ void Update_Teleop()
 	float speed = ControllerA.RightStick.x;
 	float leftmotorspeed = lerp(speed,-speed, rotation);
 	float rightmotorspeed = -lerp(speed,-speed, rotation);
-*/
+	*/
 
 	// Clamped squared interpolation for the drive motors
 	float rotation = -ControllerA.RightStick.x * 0.75;
-	rotation *= (rotation<0) ? -rotation : rotation;
+rotation *= (rotation<0) ? -rotation : rotation;
 
 	// : Calculate Motor Speed
 	float leftmotorspeed = -lerp(ControllerA.LeftStick.y, -ControllerA.LeftStick.y, rotation);
 	float rightmotorspeed = lerp(ControllerA.LeftStick.y, -ControllerA.LeftStick.y, -rotation);
 
+  // : Harvester code
+	if (ControllerA.Buttons.Y == ButtonState_Pressed)
+	{
+		if (HarvesterStatus == forward)
+		{
+			HarvesterStatus = stopped;
+		}
+		else if (HarvesterStatus == stopped)
+		{
+			HarvesterStatus = reversed;
+		}
+		else if (HarvesterStatus == reversed)
+		{
+			HarvesterStatus = forward;
+		}
+		motor[Motor_Harvester] = HarvesterStatus;
+	}
+
+	/*
 	//motor[motorI] = Map(ControllerA.Buttons.A, ControllerA.Buttons.B, speed, -speed, 0);
 	int deltame = nMotorEncoder[motorI];
 	nMotorEncoder[motorI] = 0;
@@ -72,23 +92,17 @@ void Update_Teleop()
 
 	if(ControllerA.Buttons.A) count = 0;
 	else
-	if(count > -650)
+	if(count > -1440 * 1 * 0.9875)
 	{
-		motor[motorI] = -40;
+	motor[motorI] = -100;
 	}
 	else
 	{
-		playImmediateTone(400,3);
-		motor[motorI] = 0;
-	}
+	motor[motorI] = 0;
+	}*/
 
-	if(ControllerA.Buttons.B)
-	{
-		count = -1000;
-		motor[motorI] = 25;
-	}
 
-//	playImmediateTone(100+count, 10);
+	//	playImmediateTone(100+count, 10);
 
 	// :: Drive State Controller Mapping ::
 	// ** Calculate the lerp between the positive position of the xaxis lerp(-1,1, (controller#.#Stick.x+1.0)/2.0)
@@ -114,9 +128,6 @@ void Update_Teleop()
 
 	//motor[Motor_Drive_Left] = Map(ControllerA.Buttons.LB, ControllerA.Buttons.LT, 100, 100, 0);
 	//motor[Motor_Drive_Right] = Map(ControllerA.Buttons.RB, ControllerA.Buttons.RT, -100, -100, 0);
-
-	motor[motorA] = Map(ControllerA.Buttons.LB, ControllerA.Buttons.RB, 200, -200, 0);
-	motor[motorB] = -motor[motorA];
 }
 
 /*
