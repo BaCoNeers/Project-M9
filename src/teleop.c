@@ -84,6 +84,28 @@ rotation *= (rotation<0) ? -rotation : rotation;
 	}
 
 	/*
+<<<<<<< HEAD
+	 * Left/right arm code. (servo)
+	*/
+	if (ControllerA.Buttons.LB == ButtonState_Pressed)
+	{
+		servo[Servo_Arm_Left] = (ServoValue[Servo_Arm_Left] == 30) ? 228: 30;
+	}
+
+	if (ControllerA.Buttons.RB == ButtonState_Pressed)
+	{
+		servo[Servo_Arm_Right] = (ServoValue[Servo_Arm_Right] == 30) ? 243: 30;
+	}
+
+	// Goal keeper servo code
+	if (ControllerA.Buttons.X == ButtonState_Pressed)
+	{
+		servo[Servo_GoalKeeper] = (ServoValue[Servo_GoalKeeper] == 60) ? 100: 60;
+	}
+
+	/*
+=======
+>>>>>>> e8f6f8f209d5c04c66dcf200a549329bb3d6574f
 	//motor[motorI] = Map(ControllerA.Buttons.A, ControllerA.Buttons.B, speed, -speed, 0);
 	int deltame = nMotorEncoder[motorI];
 	nMotorEncoder[motorI] = 0;
