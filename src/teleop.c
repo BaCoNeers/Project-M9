@@ -84,7 +84,6 @@ rotation *= (rotation<0) ? -rotation : rotation;
 	}
 
 	/*
-<<<<<<< HEAD
 	 * Left/right arm code. (servo)
 	*/
 	if (ControllerA.Buttons.LB == ButtonState_Pressed)
@@ -104,8 +103,6 @@ rotation *= (rotation<0) ? -rotation : rotation;
 	}
 
 	/*
-=======
->>>>>>> e8f6f8f209d5c04c66dcf200a549329bb3d6574f
 	//motor[motorI] = Map(ControllerA.Buttons.A, ControllerA.Buttons.B, speed, -speed, 0);
 	int deltame = nMotorEncoder[motorI];
 	nMotorEncoder[motorI] = 0;
