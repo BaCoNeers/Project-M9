@@ -158,15 +158,19 @@ void Update()
 	if (ControllerA.Buttons.LeftStick == ButtonState_Active) playImmediateTone(500, 1); // Input Test aka Horn
 }
 
-/*
-* Application Entry Point
-*/
-task main
+void default_ext_devices()
 {
 	// Defaults servos
 	servo[Servo_Arm_Left] = 30;
 	servo[Servo_Arm_Right] = 30;
 	servo[Servo_GoalKeeper] = 100;
+}
+/*
+* Application Entry Point
+*/
+task main
+{
+	default_ext_devices();
 	// Set motor exhaust to 1/4 speed (TEMP)
 	motor[Motor_Exhaust] = -25;
 	Init();
