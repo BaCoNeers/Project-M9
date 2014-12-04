@@ -104,7 +104,7 @@ float Controller_ApplyThreshold(float value)
 /*
 * Updates a controller object
 */
-void Update_Controller(Controller &controller)
+void Update_Controller(Controller &pcontroller)
 {
 	// Update the Joystick(s)
 	getJoystickSettings(joystick);
@@ -123,35 +123,47 @@ void Update_Controller(Controller &controller)
 	const char BUTTON_LS = 0x0B;		//Left analog thumbstick (when pressed in)
 	const char BUTTON_RS = 0x0C;		//Right analog thumbstick (when pressed in)
 
-	// Update Controller Buttons
-	Controller_SetButtonState(controller.Buttons.A, joy1Btn(BUTTON_A));
-	Controller_SetButtonState(controller.Buttons.B, joy1Btn(BUTTON_B));
-	Controller_SetButtonState(controller.Buttons.X, joy1Btn(BUTTON_X));
-	Controller_SetButtonState(controller.Buttons.Y, joy1Btn(BUTTON_Y));
-	Controller_SetButtonState(controller.Buttons.Start, joy1Btn(BUTTON_START));
-	Controller_SetButtonState(controller.Buttons.Back, joy1Btn(BUTTON_BACK));
-	Controller_SetButtonState(controller.Buttons.LB, joy1Btn(BUTTON_LB));
-	Controller_SetButtonState(controller.Buttons.LeftStick, joy1Btn(BUTTON_LS));
-	Controller_SetButtonState(controller.Buttons.RB, joy1Btn(BUTTON_RB));
-	Controller_SetButtonState(controller.Buttons.RightStick, joy1Btn(BUTTON_RS));
-	Controller_SetButtonState(controller.Buttons.LT, joy1Btn(BUTTON_LT));
-	Controller_SetButtonState(controller.Buttons.RT, joy1Btn(BUTTON_RT));
-
 
 	// Update the Joystick
 	// Use a square threshold because of the LS-X-A-RS-Y-A racing layout
-	if(controller.ControllerID == 0)
+	if(pcontroller.ControllerID == 0)
 	{
-		controller.LeftStick.x = Controller_ApplyThreshold((float)joystick.joy1_x1 / 128.0);
-		controller.LeftStick.y = Controller_ApplyThreshold((float)joystick.joy1_y1 / 128.0);
-		controller.RightStick.x = Controller_ApplyThreshold((float)joystick.joy1_x2 / 128.0);
-		controller.RightStick.y = Controller_ApplyThreshold((float)joystick.joy1_y2 / 128.0);
-	} else if (controller.ControllerID == 1)
+		pcontroller.LeftStick.x = Controller_ApplyThreshold((float)joystick.joy1_x1 / 128.0);
+		pcontroller.LeftStick.y = Controller_ApplyThreshold((float)joystick.joy1_y1 / 128.0);
+		pcontroller.RightStick.x = Controller_ApplyThreshold((float)joystick.joy1_x2 / 128.0);
+		pcontroller.RightStick.y = Controller_ApplyThreshold((float)joystick.joy1_y2 / 128.0);
+			// Update Controller Buttons
+	Controller_SetButtonState(pcontroller.Buttons.A, joy1Btn(BUTTON_A));
+	Controller_SetButtonState(pcontroller.Buttons.B, joy1Btn(BUTTON_B));
+	Controller_SetButtonState(pcontroller.Buttons.X, joy1Btn(BUTTON_X));
+	Controller_SetButtonState(pcontroller.Buttons.Y, joy1Btn(BUTTON_Y));
+	Controller_SetButtonState(pcontroller.Buttons.Start, joy1Btn(BUTTON_START));
+	Controller_SetButtonState(pcontroller.Buttons.Back, joy1Btn(BUTTON_BACK));
+	Controller_SetButtonState(pcontroller.Buttons.LB, joy1Btn(BUTTON_LB));
+	Controller_SetButtonState(pcontroller.Buttons.LeftStick, joy1Btn(BUTTON_LS));
+	Controller_SetButtonState(pcontroller.Buttons.RB, joy1Btn(BUTTON_RB));
+	Controller_SetButtonState(pcontroller.Buttons.RightStick, joy1Btn(BUTTON_RS));
+	Controller_SetButtonState(pcontroller.Buttons.LT, joy1Btn(BUTTON_LT));
+	Controller_SetButtonState(pcontroller.Buttons.RT, joy1Btn(BUTTON_RT));
+	} else if (pcontroller.ControllerID == 1)
 	{
-		controller.LeftStick.x = Controller_ApplyThreshold((float)joystick.joy2_x1 / 128.0);
-		controller.LeftStick.y = Controller_ApplyThreshold((float)joystick.joy2_y1 / 128.0);
-		controller.RightStick.x = Controller_ApplyThreshold((float)joystick.joy2_x2 / 128.0);
-		controller.RightStick.y = Controller_ApplyThreshold((float)joystick.joy2_y2 / 128.0);
+		pcontroller.LeftStick.x = Controller_ApplyThreshold((float)joystick.joy2_x1 / 128.0);
+		pcontroller.LeftStick.y = Controller_ApplyThreshold((float)joystick.joy2_y1 / 128.0);
+		pcontroller.RightStick.x = Controller_ApplyThreshold((float)joystick.joy2_x2 / 128.0);
+		pcontroller.RightStick.y = Controller_ApplyThreshold((float)joystick.joy2_y2 / 128.0);
+			// Update Controller Buttons
+	Controller_SetButtonState(pcontroller.Buttons.A, joy2Btn(BUTTON_A));
+	Controller_SetButtonState(pcontroller.Buttons.B, joy2Btn(BUTTON_B));
+	Controller_SetButtonState(pcontroller.Buttons.X, joy2Btn(BUTTON_X));
+	Controller_SetButtonState(pcontroller.Buttons.Y, joy2Btn(BUTTON_Y));
+	Controller_SetButtonState(pcontroller.Buttons.Start, joy2Btn(BUTTON_START));
+	Controller_SetButtonState(pcontroller.Buttons.Back, joy2Btn(BUTTON_BACK));
+	Controller_SetButtonState(pcontroller.Buttons.LB, joy2Btn(BUTTON_LB));
+	Controller_SetButtonState(pcontroller.Buttons.LeftStick, joy2Btn(BUTTON_LS));
+	Controller_SetButtonState(pcontroller.Buttons.RB, joy2Btn(BUTTON_RB));
+	Controller_SetButtonState(pcontroller.Buttons.RightStick, joy2Btn(BUTTON_RS));
+	Controller_SetButtonState(pcontroller.Buttons.LT, joy2Btn(BUTTON_LT));
+	Controller_SetButtonState(pcontroller.Buttons.RT, joy2Btn(BUTTON_RT));
 	}
 
 	// DPad Button States
@@ -169,6 +181,6 @@ void Update_Controller(Controller &controller)
 	};
 
 	// Update Controller D-Pad
-	controller.Buttons.Dpad_State = joystick.joy1_TopHat;
+	pcontroller.Buttons.Dpad_State = joystick.joy1_TopHat;
 	//Controller_SetDPadState(controller, dpad_states[controller.Buttons.Dpad_State]);
 }

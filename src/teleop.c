@@ -41,6 +41,7 @@ void Update_Teleop()
 {
 	// Update Controllers
 	Update_Controller(ControllerA);
+	ControllerB.ControllerID = 1;
 	Update_Controller(ControllerB);
 
 	// : Calculate Motor Speed
@@ -59,48 +60,49 @@ void Update_Teleop()
 
 	// Clamped squared interpolation for the drive motors
 	float rotation = -ControllerA.RightStick.x * 0.75;
-rotation *= (rotation<0) ? -rotation : rotation;
+	rotation *= (rotation<0) ? -rotation : rotation;
 
 	// : Calculate Motor Speed
 	float leftmotorspeed = -lerp(ControllerA.LeftStick.y, -ControllerA.LeftStick.y, rotation);
 	float rightmotorspeed = lerp(ControllerA.LeftStick.y, -ControllerA.LeftStick.y, -rotation);
 
-  // : Harvester code
+	// : Harvester code
 	if (ControllerA.Buttons.Y == ButtonState_Pressed)
 	{
-		if (HarvesterStatus == forward)
-		{
-			HarvesterStatus = stopped;
-		}
-		else if (HarvesterStatus == stopped)
-		{
-			HarvesterStatus = reversed;
-		}
-		else if (HarvesterStatus == reversed)
-		{
-			HarvesterStatus = forward;
-		}
+		if (HarvesterStatus == HarvesterStatus_Forward)HarvesterStatus = HarvesterStatus_Stopped;
+		else if (HarvesterStatus == HarvesterStatus_Stopped)HarvesterStatus = HarvesterStatus_Reversed;
+		else if (HarvesterStatus == HarvesterStatus_Reversed)HarvesterStatus = HarvesterStatus_Forward;
 		motor[Motor_Harvester] = HarvesterStatus;
 	}
 
 	/*
-	 * Left/right arm code. (servo)
+	* Left/right arm code. (servo)
 	*/
 	if (ControllerA.Buttons.LB == ButtonState_Pressed)
 	{
-		servo[Servo_Arm_Left] = (ServoValue[Servo_Arm_Left] == 30) ? 228: 30;
+		servo[Servo_Arm_Left] = (servo[Servo_Arm_Left] == Servo_Arm_Left_Down) ? Servo_Arm_Left_Up: Servo_Arm_Left_Down;
 	}
 
 	if (ControllerA.Buttons.RB == ButtonState_Pressed)
 	{
-		servo[Servo_Arm_Right] = (ServoValue[Servo_Arm_Right] == 30) ? 243: 30;
+		servo[Servo_Arm_Right] = (servo[Servo_Arm_Right] == Servo_Arm_Right_Down) ? Servo_Arm_Right_Up: Servo_Arm_Right_Down;
 	}
 
 	// Goal keeper servo code
 	if (ControllerA.Buttons.X == ButtonState_Pressed)
 	{
-		servo[Servo_GoalKeeper] = (ServoValue[Servo_GoalKeeper] == 60) ? 100: 60;
+		servo[Servo_GoalKeeper] = (servo[Servo_GoalKeeper] == 60) ? 100: 60;
 	}
+
+	int arm_speed = Map(
+	ControllerB.Buttons.RB,
+	ControllerB.Buttons.LB,
+	10,
+	-30,
+	0);
+
+	motor[Motor_Arm_A] = motor[Motor_Arm_C] = arm_speed;
+	motor[Motor_Arm_B] = -arm_speed;
 
 	/*
 	//motor[motorI] = Map(ControllerA.Buttons.A, ControllerA.Buttons.B, speed, -speed, 0);

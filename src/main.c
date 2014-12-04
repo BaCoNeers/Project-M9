@@ -53,6 +53,28 @@ Mode RobotMode = Teleop;
 bool Running = true;
 int VolumeStore;
 
+void default_ext_devices()
+{
+	// Defaults servos
+	servo[Servo_Arm_Left] = Servo_Arm_Left_Down;
+	servo[Servo_Arm_Right] = Servo_Arm_Right_Down;
+	servo[Servo_GoalKeeper] = 210;
+
+	if(RobotMode == Autonomous)
+	{
+		// Set motor exhaust to 1/4 speed (TEMP)
+		motor[Motor_Exhaust] = -25;
+	}
+	else if(RobotMode == Teleop)
+	{
+
+		// Set motor exhaust to 1/4 speed (TEMP)
+		motor[Motor_Exhaust] = 0;
+	}
+
+
+}
+
 /*
 * Initialize the Robot and ensure that the software is ready to operate.
 */
@@ -65,11 +87,12 @@ void Init()
 #ifdef DEBUG
 		clearTimer(T1);
 #endif
-
+		ControllerA.ControllerID = 0;
+		ControllerB.ControllerID = 1;
 
 		// Run Startup Code
 		waitForStart();
-
+		default_ext_devices();
 #ifdef DEBUG
 		long init_time = time1(T1);
 		string sa = "M9 Software Initialised: ";
@@ -83,6 +106,7 @@ void Init()
 	}
 	else if(RobotMode == Teleop)
 	{
+		default_ext_devices();
 		Init_Teleop();
 	}
 }
@@ -152,27 +176,19 @@ void Update()
 		Update_Teleop(); // Update Drive Mode
 #ifdef DEBUG
 		if(ControllerA.Buttons.Start == ButtonState_Pressed) EndState();
+		if(ControllerB.Buttons.Start == ButtonState_Pressed) EndState();
 #endif
 	}
 #endif
-	if (ControllerA.Buttons.LeftStick == ButtonState_Active) playImmediateTone(500, 1); // Input Test aka Horn
+	if (ControllerA.Buttons.LeftStick == ButtonState_Active) playImmediateTone(400, 1); // Input Test aka Horn
+	if (ControllerB.Buttons.LeftStick == ButtonState_Active) playImmediateTone(600, 1); // Input Test aka Horn
 }
 
-void default_ext_devices()
-{
-	// Defaults servos
-	servo[Servo_Arm_Left] = 30;
-	servo[Servo_Arm_Right] = 30;
-	servo[Servo_GoalKeeper] = 100;
-}
 /*
 * Application Entry Point
 */
 task main
 {
-	default_ext_devices();
-	// Set motor exhaust to 1/4 speed (TEMP)
-	motor[Motor_Exhaust] = -25;
 	Init();
 	while (Running)
 	{
