@@ -19,7 +19,7 @@
 
 // :: Definitions ::
 #define DEBUG
-//#define AUTO
+#define AUTO
 #define TELE
 
 // :: Includes ::
@@ -30,7 +30,7 @@
 #include "teleop.c"
 #endif
 #ifdef AUTO
-//#include "auto.c"
+#include "auto.c"
 #endif
 
 // :: Global Type Definitions ::
@@ -71,8 +71,6 @@ void default_ext_devices()
 		// Set motor exhaust to 1/4 speed (TEMP)
 		motor[Motor_Exhaust] = 0;
 	}
-
-
 }
 
 /*
@@ -190,11 +188,22 @@ void Update()
 task main
 {
 	Init();
+	nMotorEncoder[Encoder_Drive_Left] = 0;
+	motor[Motor_Drive_Left] = -100;
+	motor[Motor_Drive_Right] = 100;
+	Sleep(1000);
+	motor[Motor_Drive_Left] = 0;
+	motor[Motor_Drive_Right] = 0;
+
+	writeDebugStream("int x is: %d", nMotorEncoder[Encoder_Drive_Left]);
+
+	Running = false;
 	while (Running)
 	{
 		// Update
 		Update();
 		sleep(2);
 	}
+	while(true){};
 	EndState();
 }

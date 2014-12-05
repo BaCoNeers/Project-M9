@@ -4,12 +4,16 @@
 Controller ControllerA;
 Controller ControllerB;
 HarvesterStatusEnum HarvesterStatus;
+ExhaustStatusEnum ExhaustStatus;
 int MotorSpeed = 100;
 
 // :: Methods ::
 
 void Init_Teleop()
 {
+	HarvesterStatus = HarvesterStatus_Stopped;
+	ExhaustStatus = ExhaustStatus_Stopped;
+
 	// : Reset Motors :
 	/*
 	intrinsic void memset(void *pToBuffer, const char nValue, const short nNumbOfBytes)
@@ -30,10 +34,11 @@ void Init_Teleop()
 */
 signed char Map(byte &bA, byte &bB, signed char iA, signed char iB, signed char def)
 {
-return bA == ButtonState_Active ? iA : (bB == ButtonState_Active ? iB : 0);
+return bA == ButtonState_Active ? iA : (bB == ButtonState_Active ? iB : def);
 }
 int count = 0;
 int speed = 5;
+bool TeleopActive = true;
 /*
 * Updates Teleop
 */
@@ -58,6 +63,12 @@ void Update_Teleop()
 	float rightmotorspeed = -lerp(speed,-speed, rotation);
 	*/
 
+	if (ControllerA.Buttons.Back == ButtonState_Active && ControllerA.Buttons.Start == ButtonState_Pressed ||
+		ControllerB.Buttons.Back == ButtonState_Active && ControllerB.Buttons.Start == ButtonState_Pressed) TeleopActive = !TeleopActive;;
+
+		if(TeleopActive)
+		{
+
 	// Clamped squared interpolation for the drive motors
 	float rotation = -ControllerA.RightStick.x * 0.75;
 	rotation *= (rotation<0) ? -rotation : rotation;
@@ -73,6 +84,15 @@ void Update_Teleop()
 		else if (HarvesterStatus == HarvesterStatus_Stopped)HarvesterStatus = HarvesterStatus_Reversed;
 		else if (HarvesterStatus == HarvesterStatus_Reversed)HarvesterStatus = HarvesterStatus_Forward;
 		motor[Motor_Harvester] = HarvesterStatus;
+	}
+
+	// : Exhaust Button Map :
+	if (ControllerA.Buttons.A == ButtonState_Pressed)
+	{
+		if (ExhaustStatus == ExhaustStatus_Forward)ExhaustStatus = ExhaustStatus_Stopped;
+		else if (ExhaustStatus == ExhaustStatus_Stopped)ExhaustStatus = ExhaustStatus_Reversed;
+		else if (ExhaustStatus == ExhaustStatus_Reversed)ExhaustStatus = ExhaustStatus_Forward;
+		motor[Motor_Exhaust] = ExhaustStatus;
 	}
 
 	/*
@@ -94,61 +114,41 @@ void Update_Teleop()
 		servo[Servo_GoalKeeper] = (servo[Servo_GoalKeeper] == 60) ? 100: 60;
 	}
 
-	int arm_speed = Map(
-	ControllerB.Buttons.RB,
-	ControllerB.Buttons.LB,
-	10,
-	-30,
-	0);
+	if (ControllerA.Buttons.B == ButtonState_Pressed)
+	{
+		servo[Servo_Stack] = (servo[Servo_Stack] == 0) ? 255: 0;
+	}
+
+	// Lift (vertical arm)
+	int arm_speed = 0;
+	arm_speed = -20 * ControllerB.LeftStick.y;
+	if (arm_speed * arm_speed < 9) arm_speed = 0;
+
+	arm_speed = Map(
+		ControllerB.Buttons.LB,
+		ControllerB.Buttons.RB,
+		35, // Down
+		-35, // Up
+		arm_speed
+	);
+
+
 
 	motor[Motor_Arm_A] = motor[Motor_Arm_C] = arm_speed;
 	motor[Motor_Arm_B] = -arm_speed;
 
-	/*
-	//motor[motorI] = Map(ControllerA.Buttons.A, ControllerA.Buttons.B, speed, -speed, 0);
-	int deltame = nMotorEncoder[motorI];
-	nMotorEncoder[motorI] = 0;
-
-	count += deltame;
-
-	if(ControllerA.Buttons.A) count = 0;
-	else
-	if(count > -1440 * 1 * 0.9875)
-	{
-	motor[motorI] = -100;
-	}
-	else
-	{
-	motor[motorI] = 0;
-	}*/
-
-
-	//	playImmediateTone(100+count, 10);
-
-	// :: Drive State Controller Mapping ::
-	// ** Calculate the lerp between the positive position of the xaxis lerp(-1,1, (controller#.#Stick.x+1.0)/2.0)
-	/*
-	float wheeldistance = 0.18; // 18cm
-	Angle to center of mass = 45 degrees, sin45 = 0.7
-	Back wheel distance from center of mass = sqrt(18cm*18cm + 20cm*20cm) = 0.27cm
-	Tangent wheel distance from center of mass = 20cm
-	Lerp ratio = 2*0.27 / 0.7 = 0.77
-
-	float rotation = ControllerA.leftStick.x*ControllerA.leftStick.x > 0.1 ?
-	lerp(0,1,ControllerA.leftStick.x)
-	: 0;
-	*/
-	// Unused
-	//float leftbackmotorspeed = -lerp(ControllerA.leftStick.y, -ControllerA.leftStick.y, rotation*0.77);
-	//float rightbackmotorspeed = -lerp(ControllerA.leftStick.y, -ControllerA.leftStick.y, -rotation*0.77);
-
-
 	// : Mapping of Servos and Motors to Sticks and Buttons :
 	motor[Motor_Drive_Left] = MotorSpeed * leftmotorspeed;
 	motor[Motor_Drive_Right] = MotorSpeed * rightmotorspeed;
-
-	//motor[Motor_Drive_Left] = Map(ControllerA.Buttons.LB, ControllerA.Buttons.LT, 100, 100, 0);
-	//motor[Motor_Drive_Right] = Map(ControllerA.Buttons.RB, ControllerA.Buttons.RT, -100, -100, 0);
+}
+else
+{
+	playImmediateTone(300,10);
+	motor[Motor_Drive_Left] = 0;
+	motor[Motor_Drive_Right] = 0;
+	motor[Motor_Arm_A] = motor[Motor_Arm_C] = motor[Motor_Arm_B] = 0;
+	motor[Motor_Exhaust] =motor[Motor_Harvester] = 0;
+}
 }
 
 /*
