@@ -118,7 +118,7 @@ void EndState()
 #ifdef AUTO
 	if (RobotMode == Autonomous)
 	{
-		Autonomous_End(); // Update Autonomous Mode
+		Auto_End(); // Update Autonomous Mode
 		RobotMode = Teleop;
 #ifdef DEBUG
 		writeDebugStreamLine("Autonomous Mode End!"); // Debug
@@ -158,7 +158,8 @@ void Update()
 #ifdef AUTO
 	if (RobotMode == Autonomous)
 	{
-		if (totaltime >= 30.0)  // End autonomous after 30 seconds
+		Auto_Update(delta);
+		if (totaltime >= 29.5)  // End autonomous after 30 seconds
 		{
 			PlayImmediateTone(300, 20);
 			EndState();
@@ -188,15 +189,6 @@ void Update()
 task main
 {
 	Init();
-	nMotorEncoder[Encoder_Drive_Left] = 0;
-	motor[Motor_Drive_Left] = -100;
-	motor[Motor_Drive_Right] = 100;
-	Sleep(1000);
-	motor[Motor_Drive_Left] = 0;
-	motor[Motor_Drive_Right] = 0;
-
-	writeDebugStream("int x is: %d", nMotorEncoder[Encoder_Drive_Left]);
-
 	Running = false;
 	while (Running)
 	{
@@ -204,6 +196,5 @@ task main
 		Update();
 		sleep(2);
 	}
-	while(true){};
 	EndState();
 }

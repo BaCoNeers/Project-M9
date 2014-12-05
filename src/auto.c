@@ -1,5 +1,6 @@
 // :: Definitions ::
 #define MAX_AUTO_EVENTS 100
+#define MAX_EVENT_TIME 5.0
 // Event location definitions
 // float
 #define EL_DRIVE_CURRENT_DISTANCE 2
@@ -65,49 +66,98 @@ int Current_Event = 0;
 int Total_Left_Encoder_Ticks = 0;
 int Total_Right_Encoder_Ticks = 0;
 
+float Left_Motor_Speed_Adjust = 1.0;
+float Right_Motor_Speed_Adjust = 1.0;
+float Current_Event_Time = 0.0;
+
+
 // :: Functions ::
 
+void Auto_Init()
+{
+
+}
+
+void Auto_End()
+{
+
+}
+
+void Auto_End_Event()
+{
+	Current_Event = 0;
+	Total_Left_Encoder_Ticks = 0;
+	Total_Right_Encoder_Ticks = 0;
+	Current_Event_Time = 0.0;
+}
 
 // Autonomous update function
-void Auto_Update()
+void Auto_Update(float delta)
 {
-	AutoEvent* current_event = &Events[Current_Event];
-
-	if (current_event->Type == AutoEventType_Drive)
+	if(Current_Event < Num_Events)
 	{
-		int speed = 100 * current_event->data_f[EL_DRIVE_SPEED];
-		int left_encoder_ticks = nMotorEncoder[Encoder_Drive_Left];
-		int right_encoder_ticks = nMotorEncoder[Encoder_Drive_Right];
-		float distance_left = 10.0 * (float)Total_Left_Encoder_Ticks;
-		float distance_right = 10.0 * (float)Total_Right_Encoder_Ticks;
-		float delta_distance = (Total_Left_Encoder_Ticks + Total_Right_Encoder_Ticks) / 2.0;
-	}
-	else if (current_event->Type == AutoEventType_Turn)
-	{
+		AutoEvent* current_event = &Events[Current_Event];
+
+		if (current_event->Type == AutoEventType_Drive)
+		{
+			int speed = 100 * current_event->data_f[EL_DRIVE_SPEED];
+			int left_delta_encoder_ticks = nMotorEncoder[Encoder_Drive_Left];
+			int right_delta_encoder_ticks = nMotorEncoder[Encoder_Drive_Right];
+			float delta_ticks = (Total_Left_Encoder_Ticks + Total_Right_Encoder_Ticks) / 2.0;
+
+			// : Speed Controll Logic :
+			int difference = Total_Left_Encoder_Ticks-Total_Right_Encoder_Ticks;
+			if(difference < 0) difference = -difference;
+			const int max_difference_ticks = (const int)(ApproximateDeltaTicks_Drive(speed) * 0.05); // 5cm of ticks at current speed
+			if(difference > max_difference_ticks)
+			{
+				if(Total_Left_Encoder_Ticks > Total_Right_Encoder_Ticks) // Left is going too fast
+				{
+					if(Right_Motor_Speed_Adjust < 1.0) Right_Motor_Speed_Adjust += 0.01; 	// +1%
+						if(Left_Motor_Speed_Adjust > 0.9) Left_Motor_Speed_Adjust -= 0.01; 		// -1%
+#ifdef DEBUG
+					writeDebugStreamLine("Left Drive Motor Faster Than Right. Adjusting: [%d/%d]", Total_Left_Encoder_Ticks, Total_Right_Encoder_Ticks);
+#endif
+					}
+				else // Right is gonig too fast
+				{
+					if(Left_Motor_Speed_Adjust < 1.0) Left_Motor_Speed_Adjust += 0.01; 		// +1%
+						if(Right_Motor_Speed_Adjust > 0.9) Right_Motor_Speed_Adjust -= 0.01; 	// -1%
+							#ifdef DEBUG
+					writeDebugStreamLine("Right Drive Motor Faster Than Right. Adjusting: [%d/%d]", Total_Right_Encoder_Ticks, Total_Left_Encoder_Ticks);
+				#endif
+					}
+			}
+
+		}
+		else if (current_event->Type == AutoEventType_Turn)
+		{
+
+		}
+		else if (current_event->Type == AutoEventType_Dispense)
+		{
+
+		}
+		else if (current_event->Type == AutoEventType_SeekIR)
+		{
+
+		}
+		else if (current_event->Type == AutoEventType_PlotIR)
+		{
+
+		}
+		else if (current_event->Type == AutoEventType_Arms)
+		{
+
+		}
 
 	}
-	else if (current_event->Type == AutoEventType_Dispense)
-	{
-
-	}
-	else if (current_event->Type == AutoEventType_SeekIR)
-	{
-
-	}
-	else if (current_event->Type == AutoEventType_PlotIR)
-	{
-
-	}
-	else if (current_event->Type == AutoEventType_Arms)
-	{
-
-	}
-
+	else Auto_End();
 };
 
 void Auto_Add_Event(AutoEvent *event)
 {
-  Events[Num_Events] = *event;
+	Events[Num_Events] = *event;
 	Num_Events++;
 };
 
@@ -123,5 +173,5 @@ void RG1G2()
 	event.Type = AutoEventType_Turn;
 	event.data_f[EL_ROTATION_ANGLE] = 90.0;
 	event.data_f[EL_ROTATION_SPEED] = 1.0;
-	Auto_Add_Event(&event);
+	Auto_Add_Event(&event)
 }
