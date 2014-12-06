@@ -10,6 +10,8 @@
 #define Encoder_Drive_Right mtr_S1_C4_2
 
 #define Motor_Harvester motorA
+#define Motor_Arm_Left motorB
+#define Motor_Arm_Right motorC
 
 #define Motor_Exhaust motorH
 

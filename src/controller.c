@@ -15,7 +15,7 @@
 */
 
 // :: Includes ::
-#include "JoystickDriver.c"
+
 
 // :: Type Definitions ::
 #define ButtonState_Inactive 0x00

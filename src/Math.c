@@ -7,6 +7,8 @@ struct vec2f{	float x, y; };
 //struct vec2s{	short x, y; };
 //struct vec2c{	char x, y; };
 
+const float fpi = 3.141592654;
+
 // :: Functions ::
 /*
 * Perform the linear interpolation between two values
@@ -35,5 +37,13 @@ float ApproximateDistance_Drive(int ticks, int speed)
 {
 	// Calculate the number of ticks per meter
 	float deltaticks = ApproximateDeltaTicks_Drive(speed);
-	return (float)ticks / deltaticks; // Ratio
+	writeDebugStreamLine("ApproximateDistance %d. T:%d",deltaticks,ticks);
+	return (float)ticks / (float)deltaticks; // Ratio
+}
+
+float fClamp(float a, float min, float max)
+{
+	if(a<min) return min;
+	if(a>max) return max;
+	return a;
 }

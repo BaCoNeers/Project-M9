@@ -64,91 +64,94 @@ void Update_Teleop()
 	*/
 
 	if (ControllerA.Buttons.Back == ButtonState_Active && ControllerA.Buttons.Start == ButtonState_Pressed ||
-		ControllerB.Buttons.Back == ButtonState_Active && ControllerB.Buttons.Start == ButtonState_Pressed) TeleopActive = !TeleopActive;;
+		ControllerB.Buttons.Back == ButtonState_Active && ControllerB.Buttons.Start == ButtonState_Pressed) TeleopActive = !TeleopActive;
 
-		if(TeleopActive)
+	if(TeleopActive)
+	{
+		// : Harvester code
+		if (ControllerA.Buttons.A == ButtonState_Pressed || ControllerB.Buttons.A == ButtonState_Pressed)
 		{
+			if (HarvesterStatus == HarvesterStatus_Forward)HarvesterStatus = HarvesterStatus_Stopped;
+			else if (HarvesterStatus == HarvesterStatus_Stopped)HarvesterStatus = HarvesterStatus_Reversed;
+			else if (HarvesterStatus == HarvesterStatus_Reversed)HarvesterStatus = HarvesterStatus_Forward;
+			motor[Motor_Harvester] = HarvesterStatus;
+		}
 
-	// Clamped squared interpolation for the drive motors
-	float rotation = -ControllerA.RightStick.x * 0.75;
-	rotation *= (rotation<0) ? -rotation : rotation;
+		// : Exhaust Button Map :
+		if (ControllerA.Buttons.Y == ButtonState_Pressed || ControllerB.Buttons.Y == ButtonState_Pressed)
+		{
+			if (ExhaustStatus == ExhaustStatus_Forward)ExhaustStatus = ExhaustStatus_Stopped;
+			else if (ExhaustStatus == ExhaustStatus_Stopped)ExhaustStatus = ExhaustStatus_Reversed;
+			else if (ExhaustStatus == ExhaustStatus_Reversed)ExhaustStatus = ExhaustStatus_Forward;
+			motor[Motor_Exhaust] = ExhaustStatus;
+		}
 
-	// : Calculate Motor Speed
-	float leftmotorspeed = -lerp(ControllerA.LeftStick.y, -ControllerA.LeftStick.y, rotation);
-	float rightmotorspeed = lerp(ControllerA.LeftStick.y, -ControllerA.LeftStick.y, -rotation);
-
-	// : Harvester code
-	if (ControllerA.Buttons.Y == ButtonState_Pressed)
-	{
-		if (HarvesterStatus == HarvesterStatus_Forward)HarvesterStatus = HarvesterStatus_Stopped;
-		else if (HarvesterStatus == HarvesterStatus_Stopped)HarvesterStatus = HarvesterStatus_Reversed;
-		else if (HarvesterStatus == HarvesterStatus_Reversed)HarvesterStatus = HarvesterStatus_Forward;
-		motor[Motor_Harvester] = HarvesterStatus;
-	}
-
-	// : Exhaust Button Map :
-	if (ControllerA.Buttons.A == ButtonState_Pressed)
-	{
-		if (ExhaustStatus == ExhaustStatus_Forward)ExhaustStatus = ExhaustStatus_Stopped;
-		else if (ExhaustStatus == ExhaustStatus_Stopped)ExhaustStatus = ExhaustStatus_Reversed;
-		else if (ExhaustStatus == ExhaustStatus_Reversed)ExhaustStatus = ExhaustStatus_Forward;
-		motor[Motor_Exhaust] = ExhaustStatus;
-	}
-
-	/*
-	* Left/right arm code. (servo)
-	*/
-	if (ControllerA.Buttons.LB == ButtonState_Pressed)
-	{
+		/*
+		* Left/right arm code. (servo)
+		*/
+		/*
+		if (ControllerA.Buttons.LB == ButtonState_Pressed)
+		{
 		servo[Servo_Arm_Left] = (servo[Servo_Arm_Left] == Servo_Arm_Left_Down) ? Servo_Arm_Left_Up: Servo_Arm_Left_Down;
-	}
+		}
 
-	if (ControllerA.Buttons.RB == ButtonState_Pressed)
-	{
+		if (ControllerA.Buttons.RB == ButtonState_Pressed)
+		{
 		servo[Servo_Arm_Right] = (servo[Servo_Arm_Right] == Servo_Arm_Right_Down) ? Servo_Arm_Right_Up: Servo_Arm_Right_Down;
-	}
+		}
+		*/
+		motor[Motor_Arm_Left] = Map(ControllerA.Buttons.LB, ControllerA.Buttons.LT, 100,-100,0);
+		motor[Motor_Arm_Right] = Map(ControllerA.Buttons.RB, ControllerA.Buttons.RT, -100,100,0);
 
-	// Goal keeper servo code
-	if (ControllerA.Buttons.X == ButtonState_Pressed)
-	{
+		// Goal keeper servo code
+		if (ControllerA.Buttons.X == ButtonState_Pressed || ControllerB.Buttons.X == ButtonState_Pressed)
+		{
 		servo[Servo_GoalKeeper] = (servo[Servo_GoalKeeper] == 60) ? 100: 60;
-	}
+		}
 
-	if (ControllerA.Buttons.B == ButtonState_Pressed)
-	{
+		if (ControllerB.Buttons.B == ButtonState_Pressed)
+		{
 		servo[Servo_Stack] = (servo[Servo_Stack] == 0) ? 255: 0;
-	}
+		}
 
-	// Lift (vertical arm)
-	int arm_speed = 0;
-	arm_speed = -20 * ControllerB.LeftStick.y;
-	if (arm_speed * arm_speed < 9) arm_speed = 0;
+		// Lift (vertical arm)
+		int arm_speed = 0;
+		arm_speed = -17 * ControllerB.LeftStick.y;
+		if(ControllerB.LeftStick.y > 0) arm_speed *= 1.25;
+		if (arm_speed * arm_speed < 9) arm_speed = 0;
 
-	arm_speed = Map(
+		arm_speed = Map(
 		ControllerB.Buttons.LB,
 		ControllerB.Buttons.RB,
-		35, // Down
-		-35, // Up
+		40, // Down
+		-40, // Up
 		arm_speed
-	);
+		);
+
+		motor[Motor_Arm_A] = motor[Motor_Arm_C] = arm_speed;
+		motor[Motor_Arm_B] = -arm_speed;
 
 
+		// Clamped squared interpolation for the drive motors
+		float rotation = -ControllerA.RightStick.x * 0.75;
+	rotation *= (rotation<0) ? -rotation : rotation;
 
-	motor[Motor_Arm_A] = motor[Motor_Arm_C] = arm_speed;
-	motor[Motor_Arm_B] = -arm_speed;
+		// : Calculate Motor Speed
+		float leftmotorspeed = -lerp(ControllerA.LeftStick.y, -ControllerA.LeftStick.y, rotation);
+		float rightmotorspeed = lerp(ControllerA.LeftStick.y, -ControllerA.LeftStick.y, -rotation);
 
-	// : Mapping of Servos and Motors to Sticks and Buttons :
-	motor[Motor_Drive_Left] = MotorSpeed * leftmotorspeed;
-	motor[Motor_Drive_Right] = MotorSpeed * rightmotorspeed;
-}
-else
-{
-	playImmediateTone(300,10);
-	motor[Motor_Drive_Left] = 0;
-	motor[Motor_Drive_Right] = 0;
-	motor[Motor_Arm_A] = motor[Motor_Arm_C] = motor[Motor_Arm_B] = 0;
-	motor[Motor_Exhaust] =motor[Motor_Harvester] = 0;
-}
+		// : Mapping of Servos and Motors to Sticks and Buttons :
+		motor[Motor_Drive_Left] = MotorSpeed * leftmotorspeed;
+		motor[Motor_Drive_Right] = MotorSpeed * rightmotorspeed;
+	}
+	else
+	{
+		playImmediateTone(300,10);
+		motor[Motor_Drive_Left] = 0;
+		motor[Motor_Drive_Right] = 0;
+		motor[Motor_Arm_A] = motor[Motor_Arm_C] = motor[Motor_Arm_B] = 0;
+		motor[Motor_Exhaust] =motor[Motor_Harvester] = 0;
+	}
 }
 
 /*
