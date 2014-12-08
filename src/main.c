@@ -69,6 +69,7 @@ void Init()
 		servo[Servo_Arm_Right] = Servo_Arm_Right_Down;
 		servo[Servo_GoalKeeper] = 210;
 		motor[Motor_Exhaust] = 0;
+		servo[Servo_Stack] = 255;
 
 		// Run Startup Code
 		waitForStart();

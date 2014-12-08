@@ -133,7 +133,7 @@ void Auto_Update(float delta)
 		AutoEvent* pcurrent_event = &Events[Current_Event];
 		pcurrent_event->data_f[EL_EVENT_TIME] += delta; // Accumulate Time
 
-		if (pcurrent_event->Type == AutoEventType_Drive)
+		if (pcurrent_event->Type == AutoEventType_Drive) // Drive
 		{
 			int speed = 100 * pcurrent_event->data_f[EL_DRIVE_SPEED];
 			int left_delta_encoder_ticks = nMotorEncoder[Encoder_Drive_Left];
@@ -155,16 +155,16 @@ void Auto_Update(float delta)
 			{
 				if(Total_Left_Encoder_Ticks > Total_Right_Encoder_Ticks) // Left is going too fast
 				{
-					if(Right_Motor_Speed_Adjust < 1.0) Right_Motor_Speed_Adjust += 0.0002; 	// +1%
-						if(Left_Motor_Speed_Adjust > 0.9) Left_Motor_Speed_Adjust -= 0.0002; 		// -1%
+					if(Right_Motor_Speed_Adjust < 1.0) Right_Motor_Speed_Adjust += 0.01; 	// +1%
+						if(Left_Motor_Speed_Adjust > 0.9) Left_Motor_Speed_Adjust -= 0.01; 		// -1%
 #ifdef DEBUG
 					writeDebugStreamLine("Left Drive Motor Faster Than Right. Adjusting: [%d/%d]", Total_Left_Encoder_Ticks, Total_Right_Encoder_Ticks);
 #endif
 				}
 				else // Right is gonig too fast
 				{
-					if(Left_Motor_Speed_Adjust < 1.0) Left_Motor_Speed_Adjust += 0.0002; 		// +1%
-						if(Right_Motor_Speed_Adjust > 0.9) Right_Motor_Speed_Adjust -= 0.0002; 	// -1%
+					if(Left_Motor_Speed_Adjust < 1.0) Left_Motor_Speed_Adjust += 0.01; 		// +1%
+						if(Right_Motor_Speed_Adjust > 0.9) Right_Motor_Speed_Adjust -= 0.01; 	// -1%
 #ifdef DEBUG
 					writeDebugStreamLine("Right Drive Motor Faster Than Right. Adjusting: [%d/%d]", Total_Right_Encoder_Ticks, Total_Left_Encoder_Ticks);
 #endif
@@ -175,27 +175,24 @@ void Auto_Update(float delta)
 			motor[Motor_Drive_Right] = -speed * fClamp(Right_Motor_Speed_Adjust,0.9,1.0);
 
 			//Calculate Distance
-
 			float delta_distance = ApproximateDistance_Drive(delta_ticks, speed);
 			pcurrent_event->data_f[EL_DRIVE_CURRENT_DISTANCE]+=delta_distance;
-			writeDebugStreamLine("cdist:%d",pcurrent_event->data_f[EL_DRIVE_CURRENT_DISTANCE]*1000);
 			if(pcurrent_event->data_f[EL_DRIVE_CURRENT_DISTANCE]>
 				pcurrent_event->data_f[EL_DRIVE_DISTANCE])
 			{
 				Auto_End_Event(); // Event Finished
 			}
 		}
-		else if (pcurrent_event->Type == AutoEventType_Turn)
+		else if (pcurrent_event->Type == AutoEventType_Turn) // Turn
 		{
-			int speed = 100 * pcurrent_event->data_f[EL_DRIVE_SPEED];
+						int speed = 100 * pcurrent_event->data_f[EL_ROTATION_SPEED];
 			int left_delta_encoder_ticks = nMotorEncoder[Encoder_Drive_Left];
 			nMotorEncoder[Encoder_Drive_Left] = 0;
 		left_delta_encoder_ticks = left_delta_encoder_ticks<0 ? -left_delta_encoder_ticks : left_delta_encoder_ticks;
-
-		int right_delta_encoder_ticks = nMotorEncoder[Encoder_Drive_Right];
+			int right_delta_encoder_ticks = nMotorEncoder[Encoder_Drive_Right];
 			nMotorEncoder[Encoder_Drive_Right] = 0;
 		right_delta_encoder_ticks = right_delta_encoder_ticks<0 ? -right_delta_encoder_ticks : right_delta_encoder_ticks;
-			float delta_ticks = (Total_Left_Encoder_Ticks + Total_Right_Encoder_Ticks) / 2.0;
+			float delta_ticks = (float)(left_delta_encoder_ticks + right_delta_encoder_ticks) / 2.0;
 
 			Total_Left_Encoder_Ticks += left_delta_encoder_ticks;
 			Total_Right_Encoder_Ticks += right_delta_encoder_ticks;
@@ -208,29 +205,30 @@ void Auto_Update(float delta)
 			{
 				if(Total_Left_Encoder_Ticks > Total_Right_Encoder_Ticks) // Left is going too fast
 				{
-					if(Right_Motor_Speed_Adjust < 1.0) Right_Motor_Speed_Adjust += 0.0002; 	// +1%
-						if(Left_Motor_Speed_Adjust > 0.9) Left_Motor_Speed_Adjust -= 0.0002; 		// -1%
+					if(Right_Motor_Speed_Adjust < 1.0) Right_Motor_Speed_Adjust += 0.01; 	// +1%
+						if(Left_Motor_Speed_Adjust > 0.9) Left_Motor_Speed_Adjust -= 0.01; 		// -1%
 #ifdef DEBUG
 					writeDebugStreamLine("Left Drive Motor Faster Than Right. Adjusting: [%d/%d]", Total_Left_Encoder_Ticks, Total_Right_Encoder_Ticks);
 #endif
 				}
-				else // Right is gonig too fas
-					if(Left_Motor_Speed_Adjust < 1.0) Left_Motor_Speed_Adjust += 0.0002; 		// +1%
-
+				else // Right is gonig too fast
+				{
+					if(Left_Motor_Speed_Adjust < 1.0) Left_Motor_Speed_Adjust += 0.01; 		// +1%
+						if(Right_Motor_Speed_Adjust > 0.9) Right_Motor_Speed_Adjust -= 0.01; 	// -1%
 #ifdef DEBUG
-				writeDebugStreamLine("Right Drive Motor Faster Than Right. Adjusting: [%d/%d]", Total_Right_Encoder_Ticks, Total_Left_Encoder_Ticks);
+					writeDebugStreamLine("Right Drive Motor Faster Than Right. Adjusting: [%d/%d]", Total_Right_Encoder_Ticks, Total_Left_Encoder_Ticks);
 #endif
+				}
 			}
-
 			//Set Motor
-			motor[Motor_Drive_Left] = speed * fClamp(Left_Motor_Speed_Adjust,0.9,1.0);
-			motor[Motor_Drive_Right] = speed * fClamp(Right_Motor_Speed_Adjust,0.9,1.0);
+			motor[Motor_Drive_Left] = (speed * fClamp(Left_Motor_Speed_Adjust,0.9,1.0));
+			motor[Motor_Drive_Right] = (speed * fClamp(Right_Motor_Speed_Adjust,0.9,1.0));
 
 			//Calculate Distance
 			float delta_distance = ApproximateDistance_Drive(delta_ticks, speed);
 			pcurrent_event->data_f[EL_ROTATION_CURRENT_ANGLE_DIST]+=delta_distance;
 
-			if(pcurrent_event->data_f[EL_ROTATION_CURRENT_ANGLE_DIST] >
+			if(pcurrent_event->data_f[EL_ROTATION_CURRENT_ANGLE_DIST]>
 				pcurrent_event->data_f[EL_ROTATION_ANGLE_DIST])
 			{
 				Auto_End_Event(); // Event Finished
@@ -288,7 +286,7 @@ void Auto_Update(float delta)
 		else if (pcurrent_event->Type == AutoEventType_Catch)
 		{
 			// Toggle the Catcher
-		servo[Servo_GoalKeeper] = (bool)pcurrent_event->data_i[EL_CATCH_MODE] ? 100: 60;
+			servo[Servo_GoalKeeper] = (bool)pcurrent_event->data_i[EL_CATCH_MODE] ? 100: 60;
 			sleep(150);
 			Auto_End_Event(); // Event Finished
 		}
@@ -308,15 +306,21 @@ void OffRamp()
 	AutoEvent event;
 
 	event.Type = AutoEventType_Drive;
-	event.data_f[EL_DRIVE_DISTANCE] = 1.0;
+	event.data_f[EL_DRIVE_DISTANCE] = 1.75;
 	event.data_f[EL_DRIVE_SPEED] = 0.5;
 	Auto_Add_Event(&event);
-/*
+
 	event.Type = AutoEventType_Turn;
-	event.data_f[EL_ROTATION_ANGLE_DIST] = Auto_AngleToDistance(180.0);
+	event.data_f[EL_ROTATION_ANGLE_DIST] = Auto_AngleToDistance(90.0);
 	event.data_f[EL_ROTATION_SPEED] = 1.0;
 	Auto_Add_Event(&event);
 
+	event.Type = AutoEventType_Drive;
+	event.data_f[EL_DRIVE_DISTANCE] = 0.85;
+	event.data_f[EL_DRIVE_SPEED] = 1.0;
+	Auto_Add_Event(&event);
+
+/*
 	event.Type = AutoEventType_Catch;
 	event.data_i[EL_CATCH_MODE] = AutoCatchMode_Down;
 	Auto_Add_Event(&event);

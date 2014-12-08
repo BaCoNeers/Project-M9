@@ -46,16 +46,16 @@ float GetTime(TTimers timer)
  * Enum for harvester status
 */
 enum HarvesterStatusEnum {
-    HarvesterStatus_Forward = 100,
-    HarvesterStatus_Stopped = 0,
-    HarvesterStatus_Reversed = -100,
+  HarvesterStatus_Forward = 100,
+  HarvesterStatus_Stopped = 0,
+	HarvesterStatus_Reversed = -100,
 };
 
 /*
  * Enum for exhaust status
 */
 enum ExhaustStatusEnum {
-    ExhaustStatus_Forward = 25,
-    ExhaustStatus_Stopped = 0,
-    ExhaustStatus_Reversed = -25,
+  ExhaustStatus_Forward = 25,
+  ExhaustStatus_Stopped = 0,
+  ExhaustStatus_Reversed = -25,
 };

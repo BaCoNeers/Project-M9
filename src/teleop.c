@@ -13,6 +13,7 @@ void Init_Teleop()
 {
 	HarvesterStatus = HarvesterStatus_Stopped;
 	ExhaustStatus = ExhaustStatus_Stopped;
+	servo[Servo_Stack] = 255;
 
 	// : Reset Motors :
 	/*
@@ -68,12 +69,20 @@ void Update_Teleop()
 
 	if(TeleopActive)
 	{
-		// : Harvester code
+		/*// : Harvester code
 		if (ControllerA.Buttons.A == ButtonState_Pressed || ControllerB.Buttons.A == ButtonState_Pressed)
 		{
 			if (HarvesterStatus == HarvesterStatus_Forward)HarvesterStatus = HarvesterStatus_Stopped;
 			else if (HarvesterStatus == HarvesterStatus_Stopped)HarvesterStatus = HarvesterStatus_Reversed;
 			else if (HarvesterStatus == HarvesterStatus_Reversed)HarvesterStatus = HarvesterStatus_Forward;
+			motor[Motor_Harvester] = HarvesterStatus;
+		}*/ // TEMP for fix on harvester
+		// : Harvester code
+		if (ControllerA.Buttons.A == ButtonState_Pressed || ControllerB.Buttons.A == ButtonState_Pressed)
+		{
+			if (HarvesterStatus == 100) HarvesterStatus = 0;
+			else if (HarvesterStatus == 0) HarvesterStatus = -100;
+			else if (HarvesterStatus == -100) HarvesterStatus = 100;
 			motor[Motor_Harvester] = HarvesterStatus;
 		}
 
@@ -101,17 +110,17 @@ void Update_Teleop()
 		}
 		*/
 		motor[Motor_Arm_Left] = Map(ControllerA.Buttons.LB, ControllerA.Buttons.LT, 100,-100,0);
-		motor[Motor_Arm_Right] = Map(ControllerA.Buttons.RB, ControllerA.Buttons.RT, -100,100,0);
+		motor[Motor_Arm_Right] = Map(ControllerA.Buttons.RB, ControllerA.Buttons.RT, 100,-100,0);
 
 		// Goal keeper servo code
 		if (ControllerA.Buttons.X == ButtonState_Pressed || ControllerB.Buttons.X == ButtonState_Pressed)
 		{
-		servo[Servo_GoalKeeper] = (servo[Servo_GoalKeeper] == 60) ? 100: 60;
+		servo[Servo_GoalKeeper] = (servo[Servo_GoalKeeper] == 230) ? 60: 230;
 		}
 
 		if (ControllerB.Buttons.B == ButtonState_Pressed)
 		{
-		servo[Servo_Stack] = (servo[Servo_Stack] == 0) ? 255: 0;
+		servo[Servo_Stack] = (servo[Servo_Stack] == 255) ? 0: 255;
 		}
 
 		// Lift (vertical arm)
@@ -121,8 +130,8 @@ void Update_Teleop()
 		if (arm_speed * arm_speed < 9) arm_speed = 0;
 
 		arm_speed = Map(
-		ControllerB.Buttons.LB,
-		ControllerB.Buttons.RB,
+		ControllerB.Buttons.LT,
+		ControllerB.Buttons.RT,
 		40, // Down
 		-40, // Up
 		arm_speed

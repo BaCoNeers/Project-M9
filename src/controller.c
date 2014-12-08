@@ -63,10 +63,10 @@ void Controller_SetButtonState(byte &out, bool state)
 	}
 	*/
 
-if(out == ButtonState_Inactive) out = state ? ButtonState_Pressed : ButtonState_Inactive;
-else if(out == ButtonState_Active) out = state ? ButtonState_Active : ButtonState_Released;
-else if(out == ButtonState_Pressed) out = state ? ButtonState_Active : ButtonState_Released;
-else if(out == ButtonState_Released) out = state ? ButtonState_Active : ButtonState_Inactive;
+	if(out == ButtonState_Inactive) out = state ? ButtonState_Pressed : ButtonState_Inactive;
+	else if(out == ButtonState_Active) out = state ? ButtonState_Active : ButtonState_Released;
+	else if(out == ButtonState_Pressed) out = state ? ButtonState_Active : ButtonState_Released;
+	else if(out == ButtonState_Released) out = state ? ButtonState_Active : ButtonState_Inactive;
 	else out = ButtonState_Inactive;
 }
 
