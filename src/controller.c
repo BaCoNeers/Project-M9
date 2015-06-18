@@ -23,6 +23,21 @@
 #define ButtonState_Pressed 0x02
 #define ButtonState_Released 0x03
 
+
+// DPad Button States
+const char dpad_states[9][4] =
+{
+	{ 1, 0, 0, 0 },
+	{ 0, 0, 0, 1 },
+	{ 0, 1, 0, 0 },
+	{ 0, 0, 1, 0 },
+	{ 1, 0, 0, 1 },
+	{ 0, 1, 0, 1 },
+	{ 0, 1, 1, 0 },
+	{ 1, 0, 1, 0 },
+	{ 0, 0, 0, 0 },
+};
+
 struct Controller_Buttons // ControllerButtons Structure
 {
 	byte
@@ -73,12 +88,12 @@ void Controller_SetButtonState(byte &out, bool state)
 /*
 * Set the current Up,Down,Left,Right DPad Button States based on an input set array
 */
-void Controller_SetDPadState(Controller &controller, char* const input_state_set)
+void Controller_SetDPadState(Controller &controller, char* input_state_set)
 {
-	Controller_SetButtonState(controller.Buttons.Dpad_Up, (const bool)input_state_set[0]);
-	Controller_SetButtonState(controller.Buttons.Dpad_Down, (const bool)input_state_set[1]);
-	Controller_SetButtonState(controller.Buttons.Dpad_Left, (const bool)input_state_set[2]);
-	Controller_SetButtonState(controller.Buttons.Dpad_Right, (const bool)input_state_set[3]);
+	Controller_SetButtonState(controller.Buttons.Dpad_Up, (bool)input_state_set[0]);
+	Controller_SetButtonState(controller.Buttons.Dpad_Down, (bool)input_state_set[1]);
+	Controller_SetButtonState(controller.Buttons.Dpad_Left, (bool)input_state_set[2]);
+	Controller_SetButtonState(controller.Buttons.Dpad_Right, (bool)input_state_set[3]);
 }
 
 // Applies a threshold to a decimal value and returns a scaled ratio
@@ -166,21 +181,7 @@ void Update_Controller(Controller &pcontroller)
 	Controller_SetButtonState(pcontroller.Buttons.RT, joy2Btn(BUTTON_RT));
 	}
 
-	// DPad Button States
-	const char dpad_states[9][4] =
-	{
-		{ 1, 0, 0, 0 },
-		{ 0, 0, 0, 1 },
-		{ 0, 1, 0, 0 },
-		{ 0, 0, 1, 0 },
-		{ 1, 0, 0, 1 },
-		{ 0, 1, 0, 1 },
-		{ 0, 1, 1, 0 },
-		{ 1, 0, 1, 0 },
-		{ 0, 0, 0, 0 },
-	};
-
 	// Update Controller D-Pad
 	pcontroller.Buttons.Dpad_State = joystick.joy1_TopHat;
-	//Controller_SetDPadState(controller, dpad_states[controller.Buttons.Dpad_State]);
+	//Controller_SetDPadState(pcontroller, (char*)&dpad_states[pcontroller.Buttons.Dpad_State][0]);
 }

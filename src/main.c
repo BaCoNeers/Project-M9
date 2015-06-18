@@ -36,21 +36,7 @@ int VolumeStore;
 void default_ext_devices()
 {
 	// Defaults servos
-	servo[Servo_Arm_Left] = Servo_Arm_Left_Down;
-	servo[Servo_Arm_Right] = Servo_Arm_Right_Down;
-	servo[Servo_GoalKeeper] = 210;
-
-	if(RobotMode == Autonomous)
-	{
-		// Set motor exhaust to 1/4 speed (TEMP)
-		motor[Motor_Exhaust] = -25;
-	}
-	else if(RobotMode == Teleop)
-	{
-
-		// Set motor exhaust to 1/4 speed (TEMP)
-		motor[Motor_Exhaust] = 0;
-	}
+	servo[Servo_GoalAttach] = Servo_GoalAttach_Dettach;
 }
 
 /*
@@ -63,13 +49,8 @@ void Init()
 #ifdef AUTO
 	if(RobotMode == Autonomous)
 	{
-		OffRamp(); // Add off ramp auto events
-
-		servo[Servo_Arm_Left] = Servo_Arm_Left_Down;
-		servo[Servo_Arm_Right] = Servo_Arm_Right_Down;
-		servo[Servo_GoalKeeper] = 210;
-		motor[Motor_Exhaust] = 0;
-		servo[Servo_Stack] = 255;
+		default_ext_devices();
+		auto();
 
 		// Run Startup Code
 		waitForStart();
@@ -148,7 +129,7 @@ void Update()
 #ifdef AUTO
 	if (RobotMode == Autonomous)
 	{
-		Auto_Update(delta);
+		// Auto_Update(delta);
 		if (TotalTime >= 29.5)  // End autonomous after 30 seconds
 		{
 			playImmediateTone(300, 20);
