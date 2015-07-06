@@ -3,6 +3,7 @@
 // :: Variables ::
 Controller ControllerA;
 Controller ControllerB;
+
 // :: Methods ::
 
 void Init_Teleop()
@@ -32,38 +33,54 @@ void Update_Teleop()
 	ControllerB.ControllerID = 1;
 	Update_Controller(ControllerB);
 
-	if (ControllerA.Buttons.Back == ButtonState_Active && ControllerA.Buttons.Start == ButtonState_Pressed ||
-		ControllerB.Buttons.Back == ButtonState_Active && ControllerB.Buttons.Start == ButtonState_Pressed) TeleopActive = !TeleopActive;
+	if (ControllerA.Buttons.Back == ButtonState_Pressed || ControllerB.Buttons.Back == ButtonState_Pressed)
+		TeleopActive = !TeleopActive;
 
-	if(TeleopActive)
+	if (TeleopActive)
 	{
+		// Harvester control
+		if (ControllerA.Buttons.A == ButtonState_Pressed)
+		{
+			motor[Motor_Harvester] = (motor[Motor_Harvester] == -100) ? 0 : -100;
+		}
+
+		// Screwlift control
 		if (ControllerA.Buttons.Y == ButtonState_Pressed)
 		{
-			motor[Motor_ScrewLift] = (motor[Motor_ScrewLift] == 25) ? 0 : 25;
+			if (motor[Motor_ScrewLift] == 100)
+			{
+				motor[Motor_ScrewLift] = 0;
+			}
+			else if (motor[Motor_ScrewLift] == 0)
+			{
+				motor[Motor_ScrewLift] = -100;
+			}
+			else if (motor[Motor_ScrewLift] == -100)
+			{
+				motor[Motor_ScrewLift] = 100;
+			}
 		}
 
-		motor[Motor_Arm_Left] = Map(ControllerA.Buttons.LB, ControllerA.Buttons.LT, 100,-100,0);
-		motor[Motor_Arm_Right] = Map(ControllerA.Buttons.RB, ControllerA.Buttons.RT, 100,-100,0);
+		// Left arm control
+		if (ControllerA.Buttons.LB == ButtonState_Pressed)
+		{
+			servo[Servo_Arm_Left] = (servo[Servo_Arm_Left] == 95) ? 225 : 95;
+		}
+
+		// Right arm control
+		if (ControllerA.Buttons.RB == ButtonState_Pressed)
+		{
+			servo[Servo_Arm_Right] = (servo[Servo_Arm_Right] == 155) ? 15 : 155;
+		}
 
 		// Goal attach servo code
-		if (ControllerA.Buttons.X == ButtonState_Pressed || ControllerB.Buttons.X == ButtonState_Pressed)
-		{
+		if (ControllerA.Buttons.X == ButtonState_Pressed)
 		  servo[Servo_GoalAttach] = (servo[Servo_GoalAttach] == Servo_GoalAttach_Dettach) ? Servo_GoalAttach_Attach : Servo_GoalAttach_Dettach;
-		}
 
-		if (ControllerB.Buttons.Dpad_Up == ButtonState_Pressed)
+		// Bucket servo control
+		if (ControllerA.Buttons.B == ButtonState_Pressed)
 		{
-			servo[Servo_Stack] = Servo_Stack_Up;
-		}
-		else if (ControllerB.Buttons.Dpad_Down == ButtonState_Pressed)
-		{
-			servo[Servo_Stack] = Servo_Stack_Down;
-		}
-
-		// Stack servo code
-		if (ControllerB.Buttons.B == ButtonState_Pressed)
-		{
-		  servo[Servo_Bucket] = (servo[Servo_Bucket] == Servo_Bucket_Down) ? Servo_Bucket_Up : Servo_Bucket_Down;
+		  servo[Servo_Bucket] = (servo[Servo_Bucket] == 10) ? 120 : 10;
 		}
 
 		// Lift (vertical arm)
@@ -80,9 +97,9 @@ void Update_Teleop()
 			arm_speed
 		);
 
-		motor[Motor_Arm_A] = motor[Motor_Arm_C] = arm_speed;
+		motor[Motor_Arm_A] = -arm_speed;
 		motor[Motor_Arm_B] = -arm_speed;
-
+		motor[Motor_Arm_C] = arm_speed;
 
 		// Clamped squared interpolation for the drive motors
 		float rotation = -ControllerA.RightStick.x * 0.9;
@@ -91,7 +108,16 @@ void Update_Teleop()
 		float leftmotorspeed = -lerp(ControllerA.LeftStick.y * 0.8, -ControllerA.LeftStick.y * 0.8, rotation);
 		float rightmotorspeed = lerp(ControllerA.LeftStick.y * 0.8, -ControllerA.LeftStick.y * 0.8, -rotation);
 
-		if (ControllerA.Buttons.LB == ButtonState_Active)
+		if (ControllerA.Buttons.LT == ButtonState_Active)
+		{
+			motor[Motor_Hook] = 50;
+		}
+		else
+		{
+			motor[Motor_Hook] = -50;
+		}
+
+		if (ControllerA.Buttons.RT == ButtonState_Active)
 		{
 			motor[Motor_Drive_Left] = 20 * leftmotorspeed;
 			motor[Motor_Drive_Right] = 20 * rightmotorspeed;
@@ -103,10 +129,6 @@ void Update_Teleop()
 	else
 	{
 		playImmediateTone(300, 10);
-		motor[Motor_Drive_Left] = 0;
-		motor[Motor_Drive_Right] = 0;
-		motor[Motor_Arm_A] = motor[Motor_Arm_C] = motor[Motor_Arm_B] = 0;
-		motor[Motor_ScrewLift] = 0;
 	}
 }
 

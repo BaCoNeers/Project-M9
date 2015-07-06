@@ -1,11 +1,18 @@
-// !!! DON'T CHANGE BELOW THIS LINE !!!
-
 #include "hitechnic-irseeker-v2.h"
+
+typedef enum
+{
+	A1,A2,A3,A4,A5,A6,A7,A8,A9,A10,
+	B1,B2,B3,B4,B5,T,Mode_Num_Modes
+} Auto_Mode;
+
+char* mode_name[] = {"A1","A2","A3","A4","A5","A6","A7","A8","A9","A10","B1","B2","B3","B4","B5","T"};
+
 
 void _drive(float time, int speed)
 {
 	motor[Motor_Drive_Left] = -speed;
-	motor[Motor_Drive_Right] = speed - 2;
+	motor[Motor_Drive_Right] = speed;
 
 	sleep(time);
 
@@ -16,7 +23,7 @@ void _drive(float time, int speed)
 void _turn(float time, int leftSpeed, int rightSpeed)
 {
 	motor[Motor_Drive_Left] = -leftSpeed;
-	motor[Motor_Drive_Right] = rightSpeed - 2; // Fixes incorrect motor powers
+	motor[Motor_Drive_Right] = rightSpeed;
 
 	sleep(time);
 
@@ -24,21 +31,26 @@ void _turn(float time, int leftSpeed, int rightSpeed)
 	motor[Motor_Drive_Right] = 0;
 }
 
-void _goalAttachControl(bool attach)
+void _liftControl(float time, int speed)
 {
-	servo[Servo_GoalAttach] = (attach) ? Servo_GoalAttach_Attach : Servo_GoalAttach_Dettach;
+	motor[Motor_Arm_A] = speed;
+	motor[Motor_Arm_B] = speed;
+	motor[Motor_Arm_C] = -speed;
+	sleep(time);
+	motor[Motor_Arm_A] = 0;
+	motor[Motor_Arm_B] = 0;
+	motor[Motor_Arm_C] = 0;
+	sleep(100);
 }
 
-void _bucketControl(bool doIWantItToGoUp)
+void _goalAttachControl(bool attach)
 {
-	if (doIWantItToGoUp == true)
-	{
-		servo[Servo_Bucket] = Servo_Bucket_Up; //up
-	}
-	else
-	{
-		servo[Servo_Bucket] = Servo_Bucket_Down; //down
-	}
+servo[Servo_GoalAttach] = (attach) ? Servo_GoalAttach_Attach : Servo_GoalAttach_Dettach;
+}
+
+void _bucketControl(bool downIsFalse_UpIsTrue)
+{
+servo[Servo_Bucket] = (downIsFalse_UpIsTrue) ? 120 : 10;
 }
 
 int _IRTrack(tSensors link)
@@ -50,65 +62,48 @@ int _IRTrack(tSensors link)
 		return -1;
 	}
 
-	return HTIRS2readACDir(link);
+	return HTIRS2readACDir(link); // return direction (sector) of strongest detected IR signal
 }
 
-void _turnToIRBeacon(int dir)
+
+/*
+*  Autonomous Ramp Start
+*
+*   Off the ramp
+*/
+void auto_a1()
 {
-	switch (dir)
-	{
-	  case 1: // -67.5 to -90
-	    break;
-	  case 2: // -45 to -67.5
-	  	break;
-	  case 3: // -22.5 to -45
-	  	break;
-	  case 4: // 0 to -22.5
-	  	break;
-	  case 5: // 0
-	  	break;
-	  case 6: // 0 to 22.5
-	  	break;
-	  case 7: // 22.5 to 45
-	  	break;
-	  case 8: // 45 to 67.5
-	  	break;
-	  case 9: // 90
-	  	break;
-	  default: // NO SIGNAL
-
-	}
+	_drive(2800, -30); // Drive in reverse off the ramp
 }
 
-
-// i will comment my code
-// haydn
-
-// DISREGARD THE FIRST COMMENT OF THIS FILE HERE
-// !!! DON'T CHANGE ABOVE THIS LINE !!!
-
-
-void auto_a1() // label
+/*
+*  Autonomous Ramp Start
+*
+*   Off the ramp
+*   Dispense 2 balls in 60 cm goal (starting balls)
+*/
+void auto_a2()
 {
-	_drive(2500, -30); //drives off ramp backwards
+	auto_a1(); // Off the ramp
+
+	// Drive to 60cm goal
+
+	_goalAttachControl(true); // Attach the 60 cm goal
+	// Dispense starting balls
 }
 
-void auto_a2() // label
-{
-	_drive(2500, -30); // this is to drive off backwards the ramp and to the goal but it has not been measured yet
-	// goal attach down
-	// stack up to 60cm
-	_bucketControl(true); //lifts up bucket with balls already in it
-}
-
+/*
+*  Autonomous Ramp Start
+*
+*   Off the ramp
+*   Dispense 2 balls in 60 cm goal (starting balls)
+*   Move to parking zone
+*/
 void auto_a3()
 {
-	/*_drive(2500, -30); //supposed to drive off ramp backwards to the goal not measured yet
-	// goal attach down
-	//stack up to 60cm
-	_bucketControl(true);
-	//stack down
-	_turn(time, leftSpeed, rightSpeed) //turn 90 degrees to right
+	auto_a2(); // Off ramp - dispense starting balls in 60cm goal
+
+	/*_turn(time, leftSpeed, rightSpeed) //turn 90 degrees to right
 	_drive(2500, -30); //drive forward 60cm again not measured yet
 	_turn(time, leftSpeed, rightSpeed) //turn 90 degrees to left
 	_drive(2500, -30); //drive forward 210cm again not measured yet
@@ -116,87 +111,153 @@ void auto_a3()
 	_drive(2500, -30); //drive forward 100cm again not measured yet*/
 }
 
+/*
+*  Autonomous Ramp Start
+*
+*   Off the ramp
+*   Release kickstand
+*/
 void auto_a4()
 {
-	auto_a1();
+	auto_a1(); // Off ramp
 
 	_turn(525, -60, 60)
-	// Turns left 90* facing front to centre of field					//IR required because it is stick mark watson
+	// Turns left 90* facing front to centre of field
 	sleep(250);
 	_drive(500, 100);
 	_drive(1500, -100);
 }
 
-void auto_a5()
+/*
+*  Autonomous Ramp Start
+*
+*   Off the ramp
+*   Score 2 balls in 60 cm goal (starting balls)
+*   Release kickstand
+*/
+void auto_a5() // off ramp - score 2 balls in 60cm goal - release kickstand
 {
-	_drive(2500, -30); // this is to drive off backwards the ramp and to the goal but it has not been measured yet
-	// goal attach down
+	auto_a1(); // Off the ramp
+
+	// drive to 60cm rolling goal
+
+	_goalAttachControl(true); // Attach to goal
 	// stack up to 60cm
-	_bucketControl(true); //lifts up bucket with balls already in it
+	// dispense
 	//release stick IR
 }
 
+/*
+*  Autonomous Ramp Start
+*
+*   Off the ramp
+*   Score 2 balls in 60 cm goal (starting balls)
+*   Release kickstand
+*		Move goal to parking zone
+*/
 void auto_a6()
 {
-	_drive(2500, -30); // this is to drive off backwards the ramp and to the goal but it has not been measured yet
-	// goal attach down
-	// stack up to 60cm
-	_bucketControl(true); //lifts up bucket with balls already in it
-	//release stick IR
+	auto_a5();
+
+	// drive to parking zone
 }
 
+/*
+*  Autonomous Ramp Start
+*
+*/
 void auto_a7()
 {
 	_drive(2500, -30); // this is to drive off backwards the ramp and to the goal but it has not been measured yet
-	// goal attach down
+	_goalAttachControl(true);
 	// stack up to 60cm
-	_bucketControl(true); //lifts up bucket with balls already in it
+	// dispense
 	//release stick IR
 	//collect balls in stack
 }
 
-void auto_t1()
+void auto_b5()
 {
-	// start facing reverse inwards to field
-
-	_goalAttachControl(true);
-
-	_drive(1200, -30);
-	sleep(350);
-
-	int dir = _IRTrack(Sensor_IR);
-
-	if (dir == 5) {
-		playImmediateTone(400, 50);
+	_turn(1250, -48, -56);
+	sleep(500);
+	if (_IRTrack(Sensor_IR) == 5)
+	{
+		playImmediateTone(400,400);
+		_goalAttachControl(false);
+		_turn(850, -48, -56);
+		sleep(500);
+		_turn(180, 48, 56);
+		_liftControl(3150, 100);
+		sleep(250);
+		_bucketControl(true);
+		sleep(2000);
+		_bucketControl(false);
+		sleep(750);
+		_bucketControl(true);
+		sleep(2000);
+		_bucketControl(false);
+		_liftControl(3000, -100);
+		return;
 	}
 
-	// check seeker
-	// if dir == 1 { in position 1 }
+	_turn(627, 50, -50);
+	// _turn(678, -50, 50); perfect 90 to the left
 
-	motor[Motor_Arm_A] = motor[Motor_Arm_C] = -100;
-	motor[Motor_Arm_B] = 100;
+	/*_turn(700, -47, 54);
+	sleep(500);
 
-	return;
-	_turn(690, -30, 30); // 90 right
-	sleep(350); // give time to stop momentum
-	_drive(800, -30);
-	sleep(350);
-	_turn(690, 30, -30); // 90 left
-	// if dir == 1 { in position 2 }
-
-	sleep(350);
-	_turn(710, -30, 30); // 90 right
-	sleep(350);
-	_drive(900, -30);
-	sleep(350);
-	_turn(690, 30, -30); // 90 left
-	sleep(350);
-	_drive(1470, -30);
-	sleep(350);
-	_turn(690, 30, -30); // 90 left
+	_turn(678, -50, 50);
+	sleep(500);
+	_turn(1500, -47, 54);
+	sleep(500);
+	_turn(1017, 50, -50);*/
 }
 
-void auto()
+int previous_state = 0;
+
+Auto_Mode auto_select()
 {
-		auto_t1();
+	Auto_Mode r;
+	while (true)
+	{
+		eraseDisplay();
+		nxtDisplayCenteredTextLine(1, "(L/R arrows to select):");
+		if(r<0)r=Mode_Num_Modes-1;
+		r = r % Mode_Num_Modes;
+
+		nxtDisplayCenteredBigTextLine(3, mode_name[r]);
+
+		if(nNxtButtonPressed == 1 && nNxtButtonPressed != previous_state) r++;
+		if(nNxtButtonPressed == 2 && nNxtButtonPressed != previous_state) r--;
+		if(nNxtButtonPressed == 3 && nNxtButtonPressed != previous_state) return r;
+
+		playImmediateTone(50,20);
+
+		// Store State
+		previous_state = nNxtButtonPressed;
+
+		sleep(50);
+	}
+}
+
+void auto(Auto_Mode mode)
+{
+	auto_b5();
+	return;
+
+	if(mode == A1) auto_a1();
+	else if(mode == A2) auto_a2();
+	else if(mode == A3) auto_a3();
+	else if(mode == A4) auto_a4();
+	else if(mode == A5) auto_a5();
+	else if(mode == A6) auto_a6();
+	else if(mode == A7) auto_a7();
+	else if(mode == A8) auto_a8();
+	else if(mode == A9) auto_a9();
+	else if(mode == B1) auto_b1();
+	else if(mode == B2) auto_b2();
+	else if(mode == B3) auto_b3();
+	else if(mode == B4) auto_b4();
+	else if(mode == B5) auto_b5();
+	else if(mode == T) auto_t();
 }

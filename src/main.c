@@ -36,7 +36,10 @@ int VolumeStore;
 void default_ext_devices()
 {
 	// Defaults servos
-	servo[Servo_GoalAttach] = Servo_GoalAttach_Dettach;
+	servo[Servo_GoalAttach] = Servo_GoalAttach_Attach;
+	servo[Servo_Bucket] = 10;
+	servo[Servo_Arm_Left] = 225;
+	servo[Servo_Arm_Right] = 15;
 }
 
 /*
@@ -50,10 +53,15 @@ void Init()
 	if(RobotMode == Autonomous)
 	{
 		default_ext_devices();
-		auto();
-
 		// Run Startup Code
+
+		Auto_Mode mode = auto_select();
+
 		waitForStart();
+
+		auto(mode);
+
+		//waitForStart();
 		default_ext_devices();
 
 #ifdef DEBUG
@@ -130,7 +138,7 @@ void Update()
 	if (RobotMode == Autonomous)
 	{
 		// Auto_Update(delta);
-		if (TotalTime >= 29.5)  // End autonomous after 30 seconds
+		if (TotalTime >= 31)  // End autonomous after 30 seconds
 		{
 			playImmediateTone(300, 20);
 			EndState();

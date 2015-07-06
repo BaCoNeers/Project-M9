@@ -13,6 +13,8 @@
 #define Motor_Arm_Right motorC
 
 #define Motor_ScrewLift motorH
+#define Motor_Harvester motorA
+#define Motor_Hook motorB
 
 #define Motor_Arm_A mtr_S1_C2_1
 #define Motor_Arm_B mtr_S1_C4_2
@@ -23,15 +25,12 @@
 
 // :: Servos ::
 #define Servo_Bucket servo1
-#define Servo_Stack servo2
 #define Servo_GoalAttach servo3
+#define Servo_Arm_Left servo5
+#define Servo_Arm_Right servo6
 
 #define Servo_GoalAttach_Attach 60
 #define Servo_GoalAttach_Dettach 230
-#define Servo_Bucket_Up 200
-#define Servo_Bucket_Down 26
-#define Servo_Stack_Up 10
-#define Servo_Stack_Down 145
 
 // :: Sensors ::
 #define Sensor_IR HTIRS2

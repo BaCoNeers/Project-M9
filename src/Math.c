@@ -1,4 +1,4 @@
-// :: Type Definitions ::
+ // :: Type Definitions ::
 /*
 * Structure for storing X and Y associated values
 */
